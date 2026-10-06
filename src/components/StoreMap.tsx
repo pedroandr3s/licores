@@ -1,32 +1,32 @@
 'use client';
 
-import { MapPin } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { store } from '@/data/stores';
+import { MAPS_URL } from '@/lib/constants';
 import { cn } from '@/lib/format';
 
-/** Mapa ilustrado (sin servicios externos) con la ubicación del local. */
+const EMBED_URL = `https://maps.google.com/maps?q=${encodeURIComponent(`${store.address}, Chile`)}&z=17&hl=es&output=embed`;
+
+/** Mapa interactivo de Google Maps (sin API key) con la ubicación del local. */
 export default function StoreMap({ className }: { className?: string }) {
   return (
-    <div className={cn('relative aspect-[4/3] overflow-hidden rounded-3xl border border-ink-100 bg-[#eaf3e4] shadow-card', className)} role="group" aria-label="Mapa del local">
-      <svg viewBox="0 0 400 300" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" aria-hidden>
-        <rect width="400" height="300" fill="#eaf3e4" />
-        <path d="M0 210 C60 190 90 240 160 224 C230 208 260 150 330 160 C370 166 390 150 400 140 V300 H0 Z" fill="#dcead2" />
-        <path d="M-10 60 C50 90 110 40 170 70 C230 100 270 50 410 90 V0 H-10 Z" fill="#d6e8ef" opacity=".7" />
-        <path d="M0 150 C80 120 150 170 230 130 S350 90 400 110" fill="none" stroke="#fff" strokeWidth="9" strokeLinecap="round" />
-        <path d="M60 300 C80 220 140 190 190 130 S240 20 270 0" fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" />
-        <path d="M0 150 C80 120 150 170 230 130 S350 90 400 110" fill="none" stroke="#ffd98a" strokeWidth="2.5" strokeDasharray="10 8" strokeLinecap="round" />
-        <path d="M200 300 C230 240 300 220 330 180 S380 150 400 150" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
-        {[[70, 60], [310, 40], [350, 240], [120, 260], [260, 250]].map(([x, y]) => (
-          <circle key={`${x}-${y}`} cx={x} cy={y} r="16" fill="#cfe3c2" />
-        ))}
-      </svg>
-      <div className="absolute -translate-x-1/2 -translate-y-full" style={{ left: `${store.map.x}%`, top: `${store.map.y}%` }}>
-        <span className="mb-1 block whitespace-nowrap rounded-lg bg-ink-900 px-2 py-1 text-xs font-bold text-white shadow-md">{store.shortName}</span>
-        <span className="mx-auto grid h-10 w-10 scale-125 place-items-center rounded-full border-[3px] border-white bg-coral-500 text-white shadow-lg">
-          <MapPin size={18} />
-        </span>
-      </div>
-      <p className="absolute bottom-2 left-3 rounded-md bg-white/85 px-2 py-0.5 text-[11px] font-semibold text-ink-500">Mapa ilustrativo</p>
+    <div className={cn('relative aspect-[4/3] overflow-hidden rounded-3xl border border-ink-100 bg-ink-50 shadow-card', className)}>
+      <iframe
+        title={`Mapa de ${store.name}: ${store.address}`}
+        src={EMBED_URL}
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        allowFullScreen
+        className="absolute inset-0 h-full w-full border-0"
+      />
+      <a
+        href={MAPS_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-brand-700 shadow-md hover:bg-brand-50"
+      >
+        Abrir en Google Maps <ExternalLink size={13} />
+      </a>
     </div>
   );
 }
