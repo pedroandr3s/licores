@@ -14,6 +14,7 @@ import { getReviews, ratingBreakdown } from '@/lib/reviews';
 import { cn } from '@/lib/format';
 import { availabilityLabel, availabilityStyle, storeAvailability } from '@/lib/availability';
 import { useCartActions } from '@/hooks/useCartActions';
+import { useLiveProduct } from '@/context/StoreContext';
 import Breadcrumbs from './Breadcrumbs';
 import ProductGallery from './ProductGallery';
 import Rating, { Stars } from './Rating';
@@ -32,7 +33,8 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]['id'];
 
-export default function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
+export default function ProductDetail({ product: base, related }: { product: Product; related: Product[] }) {
+  const product = useLiveProduct(base);
   const router = useRouter();
   const { add, qtyInCart } = useCartActions();
   const [qty, setQty] = useState(1);

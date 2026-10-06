@@ -402,6 +402,28 @@ export const brands: string[] = Array.from(new Set(products.map((p) => p.brand))
   a.localeCompare(b, 'es'),
 );
 
+/** Umbral desde el cual se muestra «últimas unidades» y se alerta en el panel de administración. */
+export const LOW_STOCK = 10;
+
+const baseStock: Record<string, number> = Object.fromEntries(products.map((p) => [p.id, p.stock]));
+
+/** Stock inicial (antes de ventas y ajustes). */
+export const getBaseStock = (id: string) => baseStock[id] ?? 0;
+
+/**
+ * El stock vivo se guarda en el estado de la tienda (persistido) y se refleja aquí para que los
+ * módulos que leen `product.stock` (carrito, filtros, disponibilidad) vean el valor actual.
+ * Asigna valores absolutos, por lo que es idempotente.
+ */
+export function setLiveStock(id: string, qty: number) {
+  const p = productMap[id];
+  if (p) p.stock = Math.max(0, Math.round(qty));
+}
+
+export function resetLiveStock() {
+  for (const p of products) p.stock = baseStock[p.id];
+}
+
 export const MAX_QTY_PER_LINE = 12;
 
 export const maxQty = (p: Product) => Math.max(0, Math.min(p.stock, MAX_QTY_PER_LINE));

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  ChevronDown, CircleUser, Flame, Heart, HelpCircle, LogOut, MapPin, Menu, Package, ShoppingBag, Tag, User, ChevronRight,
+  ChevronDown, CircleUser, Flame, Heart, HelpCircle, LogOut, MapPin, Menu, Package, ShoppingBag, ShieldCheck, Tag, User, ChevronRight,
 } from 'lucide-react';
 import { categories } from '@/data/categories';
 import { store } from '@/data/stores';
@@ -36,6 +36,7 @@ export function PromoBar() {
           <Link href="/donde-encontrarnos" className="hover:text-sun-300">Dónde encontrarnos</Link>
           <Link href="/mis-pedidos" className="hover:text-sun-300">Seguir mi pedido</Link>
           <Link href="/ayuda" className="hover:text-sun-300">Ayuda</Link>
+          <Link href="/admin" className="inline-flex items-center gap-1 rounded-md bg-white/10 px-2 py-0.5 hover:bg-white/20 hover:text-sun-300"><ShieldCheck size={13} /> Admin</Link>
         </nav>
       </div>
     </div>
@@ -212,6 +213,7 @@ export default function Header() {
           {navLink('/ayuda', 'Ayuda')}
           <div className="ml-auto flex items-center">
             {navLink('/mis-pedidos', 'Mis pedidos', <Package size={17} className="text-ink-400" />)}
+            {navLink('/admin', 'Admin', <ShieldCheck size={17} className="text-brand-600" />)}
           </div>
         </div>
 
@@ -318,6 +320,7 @@ export default function Header() {
               { href: '/mis-pedidos', label: 'Mis pedidos', icon: Package },
               { href: '/favoritos', label: 'Favoritos', icon: Heart },
               { href: '/ayuda', label: 'Ayuda', icon: HelpCircle },
+              { href: '/admin', label: 'Admin', icon: ShieldCheck },
             ].map((l) => (
               <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold text-ink-700 hover:bg-ink-50">
                 <l.icon size={20} className="text-ink-400" /> {l.label}

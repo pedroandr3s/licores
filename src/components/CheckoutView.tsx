@@ -125,10 +125,24 @@ export default function CheckoutView() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  /** Revisa que el stock actual alcance para todo el carrito (otro pedido pudo llevarse unidades). */
+  const checkStock = () => {
+    const short = totals.lines.find((l) => l.qty > l.product.stock);
+    if (!short) return true;
+    toast({
+      type: 'error',
+      title: 'Stock insuficiente',
+      description: short.product.stock <= 0 ? `${short.product.name} se agotó.` : `Solo quedan ${short.product.stock} unidades de ${short.product.name}.`,
+      action: { label: 'Ir al carrito', href: '/carrito' },
+    });
+    return false;
+  };
+
   const confirm = () => {
     const er = validatePayment();
     setErrors(er);
     if (Object.keys(er).length) return;
+    if (!checkStock()) return;
     setProcessing(true);
     window.setTimeout(() => {
       const now = new Date();
@@ -165,6 +179,7 @@ export default function CheckoutView() {
     e.preventDefault();
     if (processing) return;
     if (step === 0) {
+      if (!checkStock()) return;
       const er = validatePickup();
       setErrors(er);
       if (Object.keys(er).length === 0) goStep(1);

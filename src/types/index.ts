@@ -151,3 +151,17 @@ export interface Reward {
   shape: ProductShape;
   colors: [string, string];
 }
+
+/** Movimiento de inventario (ventas, ajustes y reposiciones). */
+export interface StockMove {
+  id: string;
+  date: string; // ISO
+  productId: string;
+  /** Variación de unidades (negativa en ventas) */
+  delta: number;
+  /** Stock resultante */
+  after: number;
+  reason: 'venta' | 'ajuste' | 'reposicion';
+  /** Número de pedido (ventas) */
+  ref?: string;
+}

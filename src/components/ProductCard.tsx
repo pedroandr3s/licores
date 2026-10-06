@@ -6,13 +6,15 @@ import type { Product } from '@/types';
 import { maxQty } from '@/data/products';
 import { brandSlug } from '@/lib/catalog';
 import { useCartActions } from '@/hooks/useCartActions';
+import { useLiveProduct } from '@/context/StoreContext';
 import ProductImage from './ProductImage';
 import FavoriteButton from './FavoriteButton';
 import Rating from './Rating';
 import PriceTag from './PriceTag';
 import QuantitySelector from './QuantitySelector';
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product: base }: { product: Product }) {
+  const product = useLiveProduct(base);
   const { add, setQty, qtyInCart } = useCartActions();
   const qty = qtyInCart(product.id);
   const out = product.stock <= 0;
