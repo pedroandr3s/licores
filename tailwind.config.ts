@@ -1,0 +1,101 @@
+import type { Config } from 'tailwindcss';
+
+const config: Config = {
+  content: ['./src/**/*.{ts,tsx}'],
+  theme: {
+    screens: {
+      xs: '480px',
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1280px',
+      '2xl': '1440px',
+    },
+    extend: {
+      colors: {
+        brand: {
+          50: '#f5f1ff',
+          100: '#ebe3ff',
+          200: '#d8c8ff',
+          300: '#bda0ff',
+          400: '#9b6fff',
+          500: '#7b45f5',
+          600: '#6428e0',
+          700: '#5120bb',
+          800: '#421b97',
+          900: '#2c1266',
+        },
+        coral: {
+          50: '#fff2ef',
+          100: '#ffe1db',
+          200: '#ffc3b7',
+          300: '#ff9c88',
+          400: '#ff725a',
+          500: '#fb4b32',
+          600: '#e63218',
+          700: '#bf2610',
+        },
+        sun: {
+          100: '#fff4c9',
+          200: '#ffe992',
+          300: '#ffdc5e',
+          400: '#ffcf3a',
+          500: '#f9bd0d',
+          600: '#d99a00',
+        },
+        mint: {
+          50: '#e8faf2',
+          100: '#c9f2de',
+          500: '#12b27a',
+          600: '#0c9565',
+          700: '#0a7752',
+        },
+        ink: {
+          50: '#f6f5fa',
+          100: '#eceaf4',
+          200: '#dcd9e8',
+          300: '#bdb9d0',
+          400: '#938fae',
+          500: '#6f6b8c',
+          600: '#524f6e',
+          700: '#3a3856',
+          800: '#252340',
+          900: '#14122b',
+        },
+      },
+      fontFamily: {
+        sans: ['"Figtree Variable"', 'ui-sans-serif', 'system-ui', '-apple-system', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        display: ['"Bricolage Grotesque Variable"', '"Figtree Variable"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
+      boxShadow: {
+        card: '0 1px 2px rgba(20,18,43,.04), 0 4px 16px rgba(20,18,43,.06)',
+        pop: '0 12px 40px rgba(20,18,43,.18)',
+        lift: '0 8px 28px rgba(100,40,224,.18)',
+      },
+      keyframes: {
+        shimmer: { '100%': { transform: 'translateX(100%)' } },
+        'slide-in-right': { from: { transform: 'translateX(100%)' }, to: { transform: 'translateX(0)' } },
+        'slide-in-left': { from: { transform: 'translateX(-100%)' }, to: { transform: 'translateX(0)' } },
+        'slide-in-up': { from: { transform: 'translateY(100%)' }, to: { transform: 'translateY(0)' } },
+        'fade-in': { from: { opacity: '0' }, to: { opacity: '1' } },
+        'pop-in': { from: { opacity: '0', transform: 'translateY(8px) scale(.98)' }, to: { opacity: '1', transform: 'translateY(0) scale(1)' } },
+        'toast-in': { from: { opacity: '0', transform: 'translateY(12px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
+        'check-draw': { from: { strokeDashoffset: '48' }, to: { strokeDashoffset: '0' } },
+        'ring-grow': { from: { transform: 'scale(.6)', opacity: '0' }, to: { transform: 'scale(1)', opacity: '1' } },
+      },
+      animation: {
+        'slide-in-right': 'slide-in-right .28s cubic-bezier(.22,.8,.3,1)',
+        'slide-in-left': 'slide-in-left .28s cubic-bezier(.22,.8,.3,1)',
+        'slide-in-up': 'slide-in-up .28s cubic-bezier(.22,.8,.3,1)',
+        'fade-in': 'fade-in .2s ease-out',
+        'pop-in': 'pop-in .18s ease-out',
+        'toast-in': 'toast-in .22s ease-out',
+        'check-draw': 'check-draw .5s .15s ease-out both',
+        'ring-grow': 'ring-grow .45s cubic-bezier(.2,1.2,.4,1) both',
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
