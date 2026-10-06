@@ -10,12 +10,12 @@ import { ProductGridSkeleton } from '@/components/Skeletons';
 
 const TABS: { id: string; label: string }[] = [
   { id: 'all', label: 'Todos' },
-  { id: 'perfumeria', label: 'Perfumería' },
-  { id: 'cuidado-personal', label: 'Cuidado personal' },
-  { id: 'limpieza', label: 'Limpieza' },
-  { id: 'tecnologia', label: 'Tecnología' },
-  { id: 'hogar', label: 'Hogar' },
-  { id: 'snacks', label: 'Snacks' },
+  { id: 'cervezas', label: 'Cervezas' },
+  { id: 'vinos', label: 'Vinos' },
+  { id: 'destilados', label: 'Destilados' },
+  { id: 'licores', label: 'Licores' },
+  { id: 'mixers', label: 'Bebidas' },
+  { id: 'snacks', label: 'Papas y snacks' },
 ];
 
 export default function BestSellers() {

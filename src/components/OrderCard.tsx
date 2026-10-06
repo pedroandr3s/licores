@@ -1,9 +1,9 @@
 import Link from 'next/link';
-import { ArrowRight, MapPin, Store, Truck } from 'lucide-react';
+import { ArrowRight, MapPin, Store as StoreIcon } from 'lucide-react';
 import type { Order } from '@/types';
 import { getProduct } from '@/data/products';
 import { getStore } from '@/data/stores';
-import { deliveryLabel, STATUS_LABEL, STATUS_STYLE } from '@/lib/orders';
+import { STATUS_LABEL, STATUS_STYLE } from '@/lib/orders';
 import { formatDateOnly, formatISOShort } from '@/lib/dates';
 import { formatCLP } from '@/lib/format';
 import ProductImage from './ProductImage';
@@ -16,8 +16,7 @@ export default function OrderCard({ order }: { order: Order }) {
   const items = order.items.slice(0, 4);
   const extra = order.items.length - items.length;
   const units = order.items.reduce((a, i) => a + i.qty, 0);
-  const store = getStore(order.delivery.storeId);
-  const pickup = order.delivery.mode === 'pickup';
+  const store = getStore(order.pickup.storeId);
   return (
     <article className="card overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-b border-ink-100 bg-ink-50/70 px-4 py-3.5 sm:px-6">
@@ -52,11 +51,11 @@ export default function OrderCard({ order }: { order: Order }) {
           <div className="leading-snug">
             <p className="font-bold">{units} {units === 1 ? 'producto' : 'productos'}</p>
             <p className="flex items-center gap-1.5 text-sm text-ink-600">
-              {pickup ? <Store size={14} /> : <Truck size={14} />} {deliveryLabel(order.delivery.mode)}
+              <StoreIcon size={14} /> Retiro en tienda
             </p>
             <p className="flex items-center gap-1.5 text-sm text-ink-500">
               <MapPin size={14} />
-              {pickup ? store?.name : `${order.delivery.address?.comuna}`} · {order.status === 'delivered' ? 'Entregado el' : pickup ? 'Retiro:' : 'Llega:'} {formatISOShort(order.delivery.date)}
+              {store?.name} · {order.status === 'delivered' ? 'Retirado el' : 'Retiro:'} {formatISOShort(order.pickup.date)}
             </p>
           </div>
         </div>

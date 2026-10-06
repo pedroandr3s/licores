@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Flame, ShoppingBag, Truck } from 'lucide-react';
+import { Flame, ShoppingBag } from 'lucide-react';
 import type { Product } from '@/types';
 import { maxQty } from '@/data/products';
 import { brandSlug } from '@/lib/catalog';
@@ -40,9 +40,9 @@ export default function ProductCard({ product }: { product: Product }) {
 
         <FavoriteButton productId={product.id} productName={product.name} className="absolute right-2.5 top-2.5" />
 
-        {product.freeShipping && !out && (
-          <span className="pointer-events-none absolute bottom-2.5 left-2.5 badge bg-mint-500 text-white shadow-sm">
-            <Truck size={12} /> Envío gratis
+        {product.abv !== undefined && !out && (
+          <span className="pointer-events-none absolute bottom-2.5 left-2.5 badge bg-ink-900/85 text-white shadow-sm">
+            {String(product.abv).replace('.', ',')}° alc.
           </span>
         )}
 
@@ -62,6 +62,7 @@ export default function ProductCard({ product }: { product: Product }) {
             {product.name}
           </Link>
         </h3>
+        <p className="text-xs text-ink-500">{product.volume}</p>
         <Rating rating={product.rating} reviews={product.reviews} size={13} />
 
         <div className="mt-auto pt-2">

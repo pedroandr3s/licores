@@ -3,7 +3,7 @@ import CartView from '@/components/CartView';
 
 export const metadata: Metadata = {
   title: 'Carrito de compras',
-  description: 'Revisa los productos de tu carrito, modifica cantidades y continúa tu compra en MIXMARKET.',
+  description: 'Revisa los productos de tu carrito, modifica cantidades y continúa tu compra en Oasis.',
   robots: { index: false, follow: true },
 };
 

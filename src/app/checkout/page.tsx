@@ -3,7 +3,7 @@ import CheckoutView from '@/components/CheckoutView';
 
 export const metadata: Metadata = {
   title: 'Finalizar compra',
-  description: 'Elige despacho o retiro en tienda, completa tus datos y confirma tu pedido en MIXMARKET.',
+  description: 'Elige tu día de retiro, completa tus datos y confirma tu pedido en Botillería Oasis.',
   robots: { index: false, follow: false },
 };
 

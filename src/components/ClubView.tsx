@@ -13,9 +13,9 @@ import ProductImage from './ProductImage';
 import Modal from './ui/Modal';
 
 const steps = [
-  { icon: ShoppingBag, title: 'Compra', text: 'Compra online o en cualquier tienda MIXMARKET.' },
+  { icon: ShoppingBag, title: 'Compra', text: 'Compra online o en el local de Quirihue.' },
   { icon: Coins, title: 'Acumula', text: 'Sumas 1 punto por cada $100 de compra.' },
-  { icon: Gift, title: 'Canjea', text: 'Usa tus puntos en vales, despachos gratis y productos.' },
+  { icon: Gift, title: 'Canjea', text: 'Usa tus puntos en vales, vales y productos.' },
 ];
 
 export default function ClubView() {
@@ -43,13 +43,13 @@ export default function ClubView() {
 
   return (
     <div className="container-page py-5 md:py-8">
-      <Breadcrumbs items={[{ label: 'Club MIXMARKET' }]} />
+      <Breadcrumbs items={[{ label: 'Club Oasis' }]} />
 
       <section className="mt-5 grid overflow-hidden rounded-3xl bg-gradient-to-br from-ink-900 via-ink-800 to-brand-900 text-white lg:grid-cols-[1.2fr_1fr]">
         <div className="p-6 sm:p-10 lg:p-14">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-bold text-sun-300"><Crown size={16} /> Club MIXMARKET</span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-sm font-bold text-sun-300"><Crown size={16} /> Club Oasis</span>
           <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] sm:text-5xl lg:text-6xl">Acumula puntos en tus compras.</h1>
-          <p className="mt-4 max-w-lg text-lg text-ink-200">Cada compra te acerca a un vale, un despacho gratis o un producto exclusivo. Es gratis y no vence tan rápido como crees.</p>
+          <p className="mt-4 max-w-lg text-lg text-ink-200">Cada compra te acerca a un vale, un vale o un producto exclusivo. Es gratis y no vence tan rápido como crees.</p>
           {!user && (
             <div className="mt-7 flex flex-wrap gap-3">
               <button type="button" onClick={() => openLogin('register')} className="btn btn-sun btn-lg">Unirme al Club</button>
@@ -112,7 +112,7 @@ export default function ClubView() {
             return (
               <li key={r.id} className="card flex flex-col overflow-hidden">
                 <div className="aspect-[16/10] bg-ink-50">
-                  <ProductImage product={{ id: r.id, name: r.title, brand: 'MIXMARKET', shape: r.shape, colors: r.colors }} className="h-full w-full" />
+                  <ProductImage product={{ id: r.id, name: r.title, brand: 'Oasis', shape: r.shape, colors: r.colors }} className="h-full w-full" />
                 </div>
                 <div className="flex flex-1 flex-col p-5">
                   <h3 className="text-lg font-extrabold leading-snug">{r.title}</h3>

@@ -1,6 +1,6 @@
-import { Baby, Brush, Cookie, CupSoda, Droplets, Headphones, PawPrint, Sofa, Sparkles, SprayCan, Tag, type LucideIcon } from 'lucide-react';
+import { Beer, Cookie, CupSoda, GlassWater, Martini, Tag, Wine, type LucideIcon } from 'lucide-react';
 
-const map: Record<string, LucideIcon> = { SprayCan, Droplets, Sparkles, Sofa, Headphones, Cookie, CupSoda, PawPrint, Brush, Baby };
+const map: Record<string, LucideIcon> = { Beer, Wine, GlassWater, Martini, CupSoda, Cookie };
 
 export default function CategoryIcon({ name, size = 20, className }: { name: string; size?: number; className?: string }) {
   const Icon = map[name] ?? Tag;

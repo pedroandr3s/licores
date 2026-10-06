@@ -117,7 +117,7 @@ export default function CatalogView({ categoria = '', mode = 'catalog' }: Props)
         <div>
           <h1 className="text-[28px] font-extrabold leading-tight md:text-4xl">{title}</h1>
           {category && !filters.q && <p className="mt-1 text-ink-500">{category.tagline}</p>}
-          {mode === 'new' && !filters.q && <p className="mt-1 text-ink-500">Lo último que llegó a nuestras tiendas.</p>}
+          {mode === 'new' && !filters.q && <p className="mt-1 text-ink-500">Lo último que llegó a nuestro local.</p>}
         </div>
         <p className="text-sm font-semibold text-ink-500" aria-live="polite">
           {loading ? 'Buscando…' : `${result.length} ${result.length === 1 ? 'producto' : 'productos'}`}

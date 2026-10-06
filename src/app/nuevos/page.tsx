@@ -5,7 +5,7 @@ import { ProductGridSkeleton } from '@/components/Skeletons';
 
 export const metadata: Metadata = {
   title: 'Novedades',
-  description: 'Los productos más nuevos de MIXMARKET: lo último que llegó a nuestras tiendas.',
+  description: 'Los productos más nuevos de Botillería Oasis: lo último que llegó al local.',
   alternates: { canonical: '/nuevos' },
 };
 

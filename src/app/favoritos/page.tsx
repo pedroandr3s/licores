@@ -3,7 +3,7 @@ import FavoritesView from '@/components/FavoritesView';
 
 export const metadata: Metadata = {
   title: 'Favoritos',
-  description: 'Los productos que guardaste en MIXMARKET.',
+  description: 'Los productos que guardaste en Oasis.',
   robots: { index: false, follow: false },
 };
 

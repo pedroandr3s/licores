@@ -13,7 +13,8 @@ import ProductCard from './ProductCard';
 import ProductGrid from './ProductGrid';
 import { ProductGridSkeleton } from './Skeletons';
 
-const DISCOUNTS = [0, 20, 30, 50, 70];
+const DISCOUNTS = [0, 15, 20, 25];
+const MAX_DISCOUNT = Math.max(...products.map((p) => p.discount));
 
 function soldPct(sold: number) {
   return 45 + (sold % 50);
@@ -33,7 +34,7 @@ export default function OffersView() {
   const list = useMemo(
     () =>
       products
-        .filter((p) => p.discount >= Math.max(disc, 20) && (!cat || p.category === cat))
+        .filter((p) => p.discount >= Math.max(disc, 15) && (!cat || p.category === cat))
         .sort((a, b) => b.discount - a.discount || b.sold - a.sold),
     [disc, cat],
   );
@@ -46,9 +47,9 @@ export default function OffersView() {
         <span aria-hidden className="absolute -right-16 -top-20 h-72 w-72 rounded-full bg-sun-400/90" />
         <span aria-hidden className="absolute -bottom-24 right-40 hidden h-64 w-64 rounded-full bg-white/10 lg:block" />
         <div className="relative max-w-2xl">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-sm font-bold"><Flame size={16} /> Ofertas MIXMARKET</span>
-          <h1 id="ofertas-titulo" className="mt-4 text-5xl font-extrabold leading-[1] sm:text-6xl lg:text-7xl">Hasta 70% OFF</h1>
-          <p className="mt-3 max-w-lg text-lg text-white/90">Precios rebajados en perfumería, tecnología, hogar y más. Hasta agotar stock.</p>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-sm font-bold"><Flame size={16} /> Ofertas Oasis</span>
+          <h1 id="ofertas-titulo" className="mt-4 text-5xl font-extrabold leading-[1] sm:text-6xl lg:text-7xl">Hasta {MAX_DISCOUNT}% OFF</h1>
+          <p className="mt-3 max-w-lg text-lg text-white/90">Precios rebajados en cervezas, vinos, destilados y picoteo. Hasta agotar stock.</p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
             <p className="text-lg font-bold">Oferta termina en <Countdown variant="inline" /></p>
           </div>

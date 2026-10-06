@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Copy, MapPin, Package, Store, Truck } from 'lucide-react';
+import { Copy, IdCard, MapPin, Package, Store as StoreIcon } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { useUI } from '@/context/UIContext';
 import { getProduct } from '@/data/products';
 import { getStore } from '@/data/stores';
-import { deliveryLabel } from '@/lib/orders';
 import { formatISOLong } from '@/lib/dates';
 import { formatCLP } from '@/lib/format';
 import ProductImage from './ProductImage';
@@ -36,9 +35,7 @@ export default function ConfirmationView() {
     );
   }
 
-  const pickup = order.delivery.mode === 'pickup';
-  const store = getStore(order.delivery.storeId);
-  const a = order.delivery.address;
+  const store = getStore(order.pickup.storeId);
 
   const copy = async () => {
     try {
@@ -73,32 +70,30 @@ export default function ConfirmationView() {
 
           <div className="grid gap-6 p-5 sm:grid-cols-2 sm:p-7">
             <div>
-              <h2 className="flex items-center gap-2 text-lg font-extrabold">{pickup ? <Store size={19} className="text-brand-600" /> : <Truck size={19} className="text-brand-600" />} {deliveryLabel(order.delivery.mode)}</h2>
+              <h2 className="flex items-center gap-2 text-lg font-extrabold"><StoreIcon size={19} className="text-brand-600" /> Retiro en tienda</h2>
               <div className="mt-2 space-y-1 text-[15px] text-ink-700">
-                {pickup && store ? (
+                {store && (
                   <>
                     <p className="font-bold">{store.name}</p>
                     <p className="flex items-start gap-1.5"><MapPin size={15} className="mt-1 shrink-0 text-ink-400" /> {store.address}</p>
                     <p className="text-ink-500">{store.hoursLabel}</p>
                   </>
-                ) : (
-                  a && (
-                    <>
-                      <p className="flex items-start gap-1.5"><MapPin size={15} className="mt-1 shrink-0 text-ink-400" /> {a.street} {a.number}{a.apartment ? `, ${a.apartment}` : ''}</p>
-                      <p className="pl-[21px]">{a.comuna}, {a.region}</p>
-                    </>
-                  )
                 )}
               </div>
               <p className="mt-3 rounded-lg bg-brand-50 px-3 py-2 text-sm font-semibold text-brand-800">
-                {pickup ? 'Retiro estimado:' : 'Entrega estimada:'} {formatISOLong(order.delivery.date)}
+                Retiro: {formatISOLong(order.pickup.date)}
               </p>
+              {order.items.some((i) => getProduct(i.productId)?.isAlcohol) && (
+                <p className="mt-2 flex items-start gap-2 rounded-lg bg-sun-100 px-3 py-2 text-sm font-semibold text-[#6b4700]">
+                  <IdCard size={16} className="mt-0.5 shrink-0" /> Lleva tu cédula: solo entregamos alcohol a mayores de 18 años.
+                </p>
+              )}
             </div>
             <div>
               <h2 className="text-lg font-extrabold">Pago</h2>
               <p className="mt-2 text-[15px] text-ink-700">{order.payment.label}</p>
               <p className="mt-1 text-[15px] text-ink-500">{order.customer.name} {order.customer.lastName} · {order.customer.email}</p>
-              {user && <p className="mt-3 rounded-lg bg-sun-100 px-3 py-2 text-sm font-semibold text-[#8a5a00]">Sumaste {order.pointsEarned.toLocaleString('es-CL')} puntos del Club MIXMARKET</p>}
+              {user && <p className="mt-3 rounded-lg bg-sun-100 px-3 py-2 text-sm font-semibold text-[#8a5a00]">Sumaste {order.pointsEarned.toLocaleString('es-CL')} puntos del Club Oasis</p>}
             </div>
           </div>
 
@@ -121,7 +116,7 @@ export default function ConfirmationView() {
           <dl className="space-y-1.5 border-t border-ink-100 bg-ink-50/60 px-5 py-5 text-[15px] sm:px-7">
             <div className="flex justify-between"><dt className="text-ink-600">Subtotal</dt><dd className="font-semibold">{formatCLP(order.subtotal)}</dd></div>
             <div className="flex justify-between"><dt className="text-ink-600">Descuentos</dt><dd className="font-semibold text-mint-700">-{formatCLP(order.discounts)}</dd></div>
-            <div className="flex justify-between"><dt className="text-ink-600">{pickup ? 'Retiro' : 'Despacho'}</dt><dd className="font-semibold">{order.shipping === 0 ? 'Gratis' : formatCLP(order.shipping)}</dd></div>
+            <div className="flex justify-between"><dt className="text-ink-600">Retiro en tienda</dt><dd className="font-semibold text-mint-700">Gratis</dd></div>
             <div className="flex items-end justify-between pt-2"><dt className="text-lg font-extrabold">Total</dt><dd className="font-display text-3xl font-extrabold">{formatCLP(order.total)}</dd></div>
           </dl>
         </div>

@@ -410,6 +410,35 @@ const shapes: Record<ProductShape, (c: Ctx) => ReactNode> = {
       <Shine x={97} y={112} h={80} w={6} />
     </g>
   ),
+  beer: (c) => (
+    <g>
+      <rect x={110} y={34} width={20} height={10} rx={3} fill={c.dk} />
+      <path d="M111 44 H129 V92 Q152 112 152 140 V198 Q152 208 142 208 H98 Q88 208 88 198 V140 Q88 112 111 92 Z" fill={c.c1} />
+      <rect x={88} y={132} width={64} height={52} fill={c.c2} />
+      <rect x={88} y={132} width={64} height={5} fill={W} opacity={0.5} />
+      <text x={120} y={162} textAnchor="middle" fontSize={8.5} fontWeight={800} letterSpacing={0.4} fill={W}>
+        {c.brand.toUpperCase().slice(0, 10)}
+      </text>
+      <rect x={106} y={168} width={28} height={2} fill={W} opacity={0.6} />
+      <rect x={106} y={100} width={28} height={9} rx={4} fill={W} opacity={0.2} />
+      <Shine x={94} y={120} h={70} w={6} />
+    </g>
+  ),
+  spirit: (c) => (
+    <g>
+      <rect x={106} y={34} width={28} height={20} rx={5} fill={c.dk} />
+      <rect x={110} y={52} width={20} height={14} fill={c.c1} opacity={0.9} />
+      <path d="M110 66 H130 Q130 82 148 98 Q154 108 154 124 V198 Q154 208 144 208 H96 Q86 208 86 198 V124 Q86 108 92 98 Q110 82 110 66 Z" fill={c.c1} />
+      <rect x={86} y={124} width={68} height={62} fill={W} opacity={0.93} />
+      <rect x={86} y={124} width={68} height={8} fill={c.c2} />
+      <rect x={86} y={178} width={68} height={8} fill={c.c2} />
+      <text x={120} y={158} textAnchor="middle" fontSize={8.5} fontWeight={800} letterSpacing={0.4} fill={c.dk}>
+        {c.brand.toUpperCase().slice(0, 11)}
+      </text>
+      <rect x={104} y={164} width={32} height={2} fill={c.dk} opacity={0.4} />
+      <Shine x={92} y={104} h={96} w={6} />
+    </g>
+  ),
   bottle: (c) => (
     <g>
       <rect x={82} y={102} width={76} height={104} rx={18} fill={c.c1} opacity={0.9} />

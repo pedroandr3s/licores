@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Home, Lock, ShoppingBag, Store, Trash2 } from 'lucide-react';
+import { ArrowLeft, Lock, ShoppingBag, Store, Trash2 } from 'lucide-react';
 import { useCartTotals, useStore } from '@/context/StoreContext';
 import { useUI } from '@/context/UIContext';
 import { getRelated } from '@/data/products';
-import { cn } from '@/lib/format';
 import Breadcrumbs from './Breadcrumbs';
 import CartItem from './CartItem';
 import OrderSummary from './OrderSummary';
@@ -14,7 +13,7 @@ import ProductGrid from './ProductGrid';
 import { BlockSkeleton } from './Skeletons';
 
 export default function CartView() {
-  const { hydrated, deliveryMode, dispatch } = useStore();
+  const { hydrated, dispatch } = useStore();
   const { toast } = useUI();
   const totals = useCartTotals();
   const empty = totals.lines.length === 0;
@@ -71,26 +70,11 @@ export default function CartView() {
         </section>
 
         <div className="lg:sticky lg:top-[152px]">
-          <OrderSummary totals={totals} mode={deliveryMode}>
-            <fieldset className="mb-4">
-              <legend className="mb-2 text-sm font-bold text-ink-700">¿Cómo lo recibes?</legend>
-              <div className="grid grid-cols-2 gap-2 rounded-xl bg-ink-100 p-1">
-                {([
-                  { id: 'delivery', label: 'Despacho', icon: Home },
-                  { id: 'pickup', label: 'Retiro', icon: Store },
-                ] as const).map((o) => (
-                  <button
-                    key={o.id}
-                    type="button"
-                    aria-pressed={deliveryMode === o.id}
-                    onClick={() => dispatch({ type: 'SET_MODE', mode: o.id })}
-                    className={cn('inline-flex h-10 items-center justify-center gap-2 rounded-lg text-sm font-bold transition', deliveryMode === o.id ? 'bg-white text-brand-700 shadow-sm' : 'text-ink-500 hover:text-ink-800')}
-                  >
-                    <o.icon size={16} /> {o.label}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
+          <OrderSummary totals={totals}>
+            <div className="mb-4 flex items-start gap-3 rounded-xl bg-ink-50 p-3.5 text-sm text-ink-700">
+              <Store size={18} className="mt-0.5 shrink-0 text-brand-600" />
+              <p><strong>Retiro en tienda (Quirihue).</strong> No hacemos despacho a domicilio.</p>
+            </div>
             <Link href="/checkout" className="btn btn-primary btn-lg w-full">Continuar compra</Link>
             <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-ink-500"><Lock size={13} /> Compra protegida · Demostración sin pagos reales</p>
           </OrderSummary>

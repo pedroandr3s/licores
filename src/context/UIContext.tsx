@@ -21,9 +21,6 @@ interface UIValue {
   loginRedirect: string | null;
   openLogin: (mode?: 'login' | 'register', redirect?: string) => void;
   closeLogin: () => void;
-  storeModalOpen: boolean;
-  openStoreModal: () => void;
-  closeStoreModal: () => void;
   menuOpen: boolean;
   setMenuOpen: (v: boolean) => void;
   toasts: ToastItem[];
@@ -38,7 +35,6 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [loginOpen, setLoginOpen] = useState(false);
   const [loginMode, setLoginMode] = useState<'login' | 'register'>('login');
   const [loginRedirect, setLoginRedirect] = useState<string | null>(null);
-  const [storeModalOpen, setStoreModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(1);
@@ -70,16 +66,13 @@ export function UIProvider({ children }: { children: ReactNode }) {
         setLoginOpen(true);
       },
       closeLogin: () => setLoginOpen(false),
-      storeModalOpen,
-      openStoreModal: () => setStoreModalOpen(true),
-      closeStoreModal: () => setStoreModalOpen(false),
       menuOpen,
       setMenuOpen,
       toasts,
       toast,
       dismissToast,
     }),
-    [cartOpen, loginOpen, loginMode, loginRedirect, storeModalOpen, menuOpen, toasts, toast, dismissToast],
+    [cartOpen, loginOpen, loginMode, loginRedirect, menuOpen, toasts, toast, dismissToast],
   );
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>;

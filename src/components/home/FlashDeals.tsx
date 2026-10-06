@@ -21,8 +21,8 @@ export default function FlashDeals() {
             <div className="flex items-center gap-4">
               <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-sun-400 text-ink-900"><Zap size={26} className="fill-current" /></span>
               <div>
-                <h2 id="flash" className="font-display text-2xl font-extrabold text-white md:text-[32px]">Ofertas flash</h2>
-                <p className="text-ink-200">Hasta 70% de descuento. Se acaban cuando termina el reloj.</p>
+                <h2 id="flash" className="font-display text-2xl font-extrabold text-white md:text-[32px]">Ofertas de la semana</h2>
+                <p className="text-ink-200">Packs y botellas con descuento. Se acaban cuando termina el reloj.</p>
               </div>
             </div>
             <div className="flex items-center gap-4 text-white">

@@ -11,15 +11,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: `${SITE_NAME} | ${SITE_TAGLINE}`, template: `%s | ${SITE_NAME}` },
   description:
-    'MIXMARKET es una tienda online de demostración: perfumería, cuidado personal, limpieza, hogar, tecnología y más, con despacho a domicilio o retiro en tienda.',
+    'Botillería Oasis en Quirihue (Avenida Prat 813): cervezas, vinos, destilados, licores, bebidas y papas fritas. Compra online y retira en el local. Venta solo a mayores de 18 años.',
   applicationName: SITE_NAME,
-  keywords: ['tienda online', 'retail', 'ofertas', 'perfumería', 'tecnología', 'hogar', 'Chile'],
+  keywords: ['botillería', 'licores', 'cervezas', 'vinos', 'pisco', 'papas fritas', 'Quirihue', 'Ñuble'],
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
     locale: 'es_CL',
     title: `${SITE_NAME} | ${SITE_TAGLINE}`,
-    description: 'Ofertas de hasta 70% en miles de productos. Despacho a domicilio o retiro en tienda.',
+    description: 'Ofertas en cervezas, vinos y destilados. Retiro en tienda en Quirihue.',
   },
   twitter: { card: 'summary_large_image', title: SITE_NAME, description: SITE_TAGLINE },
   robots: { index: true, follow: true },
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#6428e0',
+  themeColor: '#1a68a8',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

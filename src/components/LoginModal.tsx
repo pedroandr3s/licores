@@ -65,9 +65,9 @@ export default function LoginModal() {
   };
 
   const demo = () => {
-    setF((s) => ({ ...s, email: 'demo@mixmarket.cl', password: 'demo1234' }));
+    setF((s) => ({ ...s, email: 'demo@oasis.cl', password: 'demo1234' }));
     setErrors({});
-    finish(DEMO_USER_NAME, 'demo@mixmarket.cl');
+    finish(DEMO_USER_NAME, 'demo@oasis.cl');
   };
 
   return (

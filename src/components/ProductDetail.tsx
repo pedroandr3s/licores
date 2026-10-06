@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { BadgeCheck, CheckCircle2, RotateCcw, ShieldCheck, ShoppingBag, Truck, Zap } from 'lucide-react';
+import { BadgeCheck, CheckCircle2, Clock, IdCard, MapPin, ShieldCheck, ShoppingBag, Zap } from 'lucide-react';
 import type { Product } from '@/types';
 import { categoryMap } from '@/data/categories';
+import { store } from '@/data/stores';
+import { MIN_AGE } from '@/lib/constants';
 import { maxQty } from '@/data/products';
 import { brandSlug } from '@/lib/catalog';
 import { getReviews, ratingBreakdown } from '@/lib/reviews';
 import { cn } from '@/lib/format';
-import { useStore } from '@/context/StoreContext';
+import { availabilityLabel, availabilityStyle, storeAvailability } from '@/lib/availability';
 import { useCartActions } from '@/hooks/useCartActions';
 import Breadcrumbs from './Breadcrumbs';
 import ProductGallery from './ProductGallery';
@@ -18,7 +20,6 @@ import Rating, { Stars } from './Rating';
 import PriceTag from './PriceTag';
 import QuantitySelector from './QuantitySelector';
 import FavoriteButton from './FavoriteButton';
-import DeliverySelector from './DeliverySelector';
 import ProductGrid from './ProductGrid';
 import { formatCLP } from '@/lib/format';
 
@@ -26,14 +27,13 @@ const TABS = [
   { id: 'descripcion', label: 'Descripción' },
   { id: 'caracteristicas', label: 'Características' },
   { id: 'opiniones', label: 'Opiniones' },
-  { id: 'envios', label: 'Despacho y cambios' },
+  { id: 'envios', label: 'Retiro y cambios' },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
 
 export default function ProductDetail({ product, related }: { product: Product; related: Product[] }) {
   const router = useRouter();
-  const { deliveryMode, selectedStoreId, dispatch } = useStore();
   const { add, qtyInCart } = useCartActions();
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<TabId>('descripcion');
@@ -41,6 +41,7 @@ export default function ProductDetail({ product, related }: { product: Product; 
   const out = product.stock <= 0;
   const low = !out && product.stock <= 10;
   const max = maxQty(product);
+  const availability = storeAvailability(product);
   const inCart = qtyInCart(product.id);
   const reviews = getReviews(product);
   const breakdown = ratingBreakdown(product);
@@ -48,11 +49,6 @@ export default function ProductDetail({ product, related }: { product: Product; 
   const addToCart = () => add(product, qty);
   const buyNow = () => {
     if (add(product, qty, { silent: true }) || inCart > 0) router.push('/checkout');
-  };
-
-  const onMode = (m: 'delivery' | 'pickup') => {
-    dispatch({ type: 'SET_MODE', mode: m });
-    if (m === 'pickup' && !selectedStoreId) dispatch({ type: 'SET_STORE', storeId: 'san-carlos' });
   };
 
   return (
@@ -83,9 +79,6 @@ export default function ProductDetail({ product, related }: { product: Product; 
 
           <div className="mt-5 rounded-2xl bg-ink-50 p-4 sm:p-5">
             <PriceTag product={product} size="lg" showSavings />
-            {product.freeShipping && (
-              <p className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-mint-50 px-2.5 py-1 text-sm font-bold text-mint-700"><Truck size={15} /> Envío gratis en este producto</p>
-            )}
           </div>
 
           <p className="mt-4 text-[15px] leading-relaxed text-ink-700">{product.description.split('. ')[0].replace(/\.$/, '')}.</p>
@@ -112,25 +105,32 @@ export default function ProductDetail({ product, related }: { product: Product; 
           )}
 
           <section className="mt-8" aria-labelledby="como-recibirlo">
-            <h2 id="como-recibirlo" className="text-xl font-extrabold">¿Cómo quieres recibirlo?</h2>
-            <div className="mt-3">
-              <DeliverySelector
-                mode={deliveryMode}
-                onModeChange={onMode}
-                storeId={selectedStoreId}
-                onStoreChange={(id) => {
-                  dispatch({ type: 'SET_STORE', storeId: id });
-                  dispatch({ type: 'SET_MODE', mode: 'pickup' });
-                }}
-                product={product}
-              />
+            <h2 id="como-recibirlo" className="text-xl font-extrabold">Retiro en tienda</h2>
+            <div className="mt-3 rounded-2xl border border-brand-600 bg-white p-4 ring-2 ring-brand-600/20">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex gap-3.5">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-600 text-white"><MapPin size={22} /></span>
+                  <div>
+                    <p className="font-extrabold text-ink-900">{store.name}</p>
+                    <p className="text-sm text-ink-600">{store.address}</p>
+                    <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-600"><Clock size={14} className="text-ink-400" /> Listo en 1 hora · Gratis</p>
+                  </div>
+                </div>
+                <span className={cn('badge shrink-0', availabilityStyle[availability])}>{availabilityLabel[availability]}</span>
+              </div>
+              <p className="mt-3 rounded-xl bg-ink-50 px-3.5 py-2.5 text-sm text-ink-700">Solo retiro en tienda: no tenemos despacho a domicilio.</p>
             </div>
+            {product.isAlcohol && (
+              <p className="mt-3 flex items-start gap-2 rounded-xl bg-sun-100 px-3.5 py-2.5 text-sm font-semibold text-[#6b4700]">
+                <IdCard size={18} className="mt-0.5 shrink-0" /> Venta solo a mayores de {MIN_AGE} años. Debes presentar tu cédula de identidad al retirar.
+              </p>
+            )}
           </section>
 
           <ul className="mt-6 grid gap-3 text-sm text-ink-600 sm:grid-cols-3">
             <li className="flex items-center gap-2"><ShieldCheck size={18} className="shrink-0 text-brand-600" /> Compra protegida</li>
-            <li className="flex items-center gap-2"><RotateCcw size={18} className="shrink-0 text-brand-600" /> 30 días para cambios</li>
-            <li className="flex items-center gap-2"><BadgeCheck size={18} className="shrink-0 text-brand-600" /> Producto original</li>
+            <li className="flex items-center gap-2"><Clock size={18} className="shrink-0 text-brand-600" /> Listo en 1 hora</li>
+            <li className="flex items-center gap-2"><IdCard size={18} className="shrink-0 text-brand-600" /> Retiro con cédula</li>
           </ul>
         </div>
       </div>
@@ -178,8 +178,9 @@ export default function ProductDetail({ product, related }: { product: Product; 
                     ['Marca', product.brand],
                     ['Categoría', `${category.name} › ${product.subcategory}`],
                     ['SKU', product.sku],
-                    ['Despacho', product.availableForDelivery ? 'Disponible' : 'Solo retiro en tienda'],
-                    ['Retiro en tienda', product.availableForPickup ? 'Disponible' : 'Solo despacho'],
+                    ['Contenido', product.volume],
+                    ...(product.abv !== undefined ? [['Graduación', String(product.abv).replace('.', ',') + '° (% vol.)']] : []),
+                    ['Retiro en tienda', store.shortName],
                   ].map(([k, v]) => (
                     <div key={k} className="grid grid-cols-[130px_1fr] gap-3 py-2.5"><dt className="text-ink-500">{k}</dt><dd className="font-semibold">{v}</dd></div>
                   ))}
@@ -223,20 +224,20 @@ export default function ProductDetail({ product, related }: { product: Product; 
           {tab === 'envios' && (
             <div className="grid max-w-4xl gap-8 md:grid-cols-2">
               <div>
-                <h2 className="text-xl font-extrabold">Despacho y retiro</h2>
+                <h2 className="text-xl font-extrabold">Retiro en tienda</h2>
                 <ul className="mt-3 space-y-2 text-ink-700">
-                  <li>Despacho a domicilio entre 2 y 4 días hábiles.</li>
-                  <li>Costo de {formatCLP(3990)}; gratis desde {formatCLP(30000)} o con insignia «Envío gratis».</li>
-                  <li>Retiro en tienda gratis, listo en 2 horas.</li>
+                  <li>Solo retiro en {store.name}; no hay despacho a domicilio.</li>
+                  <li>Tu pedido queda listo en 1 hora, sin costo.</li>
+                  <li>Para retirar alcohol debes ser mayor de {MIN_AGE} años y presentar tu cédula.</li>
                 </ul>
-                <Link href="/ayuda/politicas-de-despacho" className="mt-3 inline-block font-bold text-brand-700 hover:underline">Ver políticas de despacho</Link>
+                <Link href="/ayuda/politicas-de-retiro" className="mt-3 inline-block font-bold text-brand-700 hover:underline">Ver políticas de retiro</Link>
               </div>
               <div>
                 <h2 className="text-xl font-extrabold">Cambios y devoluciones</h2>
                 <ul className="mt-3 space-y-2 text-ink-700">
-                  <li>30 días desde la recepción para solicitar cambio o devolución.</li>
-                  <li>El producto debe estar sin uso y en su empaque original.</li>
-                  <li>Puedes gestionarlo en cualquiera de nuestras tiendas.</li>
+                  <li>Revisa tu pedido al retirarlo: los reclamos se atienden en el local.</li>
+                  <li>Cambios solo por botellas dañadas o fallas de fábrica.</li>
+                  <li>Productos abiertos y refrigerados no tienen cambio.</li>
                 </ul>
                 <Link href="/ayuda/cambios-y-devoluciones" className="mt-3 inline-block font-bold text-brand-700 hover:underline">Ver cambios y devoluciones</Link>
               </div>

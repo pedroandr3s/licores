@@ -97,7 +97,7 @@ export default function FilterSidebar({ filters, onChange, onCategory, onClear }
         )}
       </Group>
 
-      <Group title="Disponibilidad">
+      <Group title="Disponibilidad y tipo">
         {AVAIL_OPTIONS.map((o) => (
           <Check key={o.id} checked={filters.avail.includes(o.id)} onChange={() => onChange({ avail: toggle<AvailFlag>(filters.avail, o.id) })} label={o.label} />
         ))}

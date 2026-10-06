@@ -5,7 +5,7 @@ import { BlockSkeleton } from '@/components/Skeletons';
 
 export const metadata: Metadata = {
   title: '¡Compra realizada!',
-  description: 'Tu pedido en MIXMARKET fue creado correctamente.',
+  description: 'Tu pedido en Oasis fue creado correctamente.',
   robots: { index: false, follow: false },
 };
 

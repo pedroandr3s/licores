@@ -1,20 +1,16 @@
 export type CategorySlug =
-  | 'perfumeria'
-  | 'cuidado-personal'
-  | 'limpieza'
-  | 'hogar'
-  | 'tecnologia'
-  | 'snacks'
-  | 'bebidas'
-  | 'mascotas'
-  | 'belleza'
-  | 'infantil';
+  | 'cervezas'
+  | 'vinos'
+  | 'destilados'
+  | 'licores'
+  | 'mixers'
+  | 'snacks';
 
 export type ProductShape =
   | 'perfume' | 'pump' | 'tube' | 'jar' | 'spray' | 'jug' | 'box' | 'bag' | 'can' | 'drink'
   | 'wine' | 'headphones' | 'speaker' | 'watch' | 'mug' | 'lamp' | 'blocks' | 'powerbank'
   | 'bowl' | 'lipstick' | 'compact' | 'plush' | 'pillow' | 'pot' | 'rolls' | 'sheets'
-  | 'mouse' | 'rollon' | 'bottle';
+  | 'mouse' | 'rollon' | 'bottle' | 'beer' | 'spirit';
 
 export interface Category {
   slug: CategorySlug;
@@ -52,10 +48,13 @@ export interface Product {
   sold: number;
   featured: boolean;
   isNew: boolean;
-  freeShipping: boolean;
   tags: string[];
-  availableForDelivery: boolean;
-  availableForPickup: boolean;
+  /** Contenido / formato (ej. 750 ml, 250 g) */
+  volume: string;
+  /** Graduación alcohólica (% vol.). Solo en productos con alcohol */
+  abv?: number;
+  /** Producto con alcohol: exige mayoría de edad */
+  isAlcohol: boolean;
 }
 
 export type Availability = 'available' | 'low' | 'none';
@@ -87,22 +86,9 @@ export interface CartLine {
   qty: number;
 }
 
-export type DeliveryMode = 'delivery' | 'pickup';
+export type OrderStatus = 'received' | 'preparing' | 'ready' | 'delivered';
 
-export type OrderStatus = 'received' | 'preparing' | 'ready' | 'shipping' | 'delivered';
-
-export type PaymentMethod = 'credit' | 'debit' | 'transfer' | 'webpay';
-
-export interface Address {
-  id: string;
-  label: string;
-  region: string;
-  comuna: string;
-  street: string;
-  number: string;
-  apartment?: string;
-  notes?: string;
-}
+export type PaymentMethod = 'credit' | 'debit' | 'transfer' | 'webpay' | 'store';
 
 export interface Customer {
   name: string;
@@ -129,14 +115,14 @@ export interface Order {
   items: OrderItem[];
   subtotal: number;
   discounts: number;
-  shipping: number;
   total: number;
-  delivery: {
-    mode: DeliveryMode;
-    address?: Address;
-    storeId?: string;
+  /** Retiro en tienda (único local): sin despacho a domicilio */
+  pickup: {
+    storeId: string;
     date: string; // YYYY-MM-DD
   };
+  /** El cliente declaró ser mayor de 18 años y presentará su cédula al retirar */
+  ageConfirmed: boolean;
   customer: Customer;
   payment: { method: PaymentMethod; label: string };
   pointsEarned: number;

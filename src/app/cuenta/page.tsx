@@ -4,7 +4,7 @@ import AccountView from '@/components/AccountView';
 
 export const metadata: Metadata = {
   title: 'Mi cuenta',
-  description: 'Administra tu perfil y tus direcciones en MIXMARKET.',
+  description: 'Administra tu perfil en Botillería Oasis.',
   robots: { index: false, follow: false },
 };
 

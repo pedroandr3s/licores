@@ -18,17 +18,6 @@ export function addDays(from: Date, n: number): Date {
   return d;
 }
 
-/** Suma días hábiles (lunes a sábado; el domingo no hay despacho). */
-export function addBusinessDays(from: Date, n: number): Date {
-  const d = addDays(from, 0);
-  let left = n;
-  while (left > 0) {
-    d.setDate(d.getDate() + 1);
-    if (d.getDay() !== 0) left--;
-  }
-  return d;
-}
-
 export const formatDateShort = (d: Date) => `${DAYS_SHORT[d.getDay()]} ${d.getDate()} ${MONTHS_SHORT[d.getMonth()]}`;
 export const formatDateLong = (d: Date) =>
   `${DAYS_LONG[d.getDay()]} ${d.getDate()} de ${MONTHS_LONG[d.getMonth()]} de ${d.getFullYear()}`;
@@ -52,27 +41,12 @@ export interface DateOption {
   hint: string;
 }
 
-/** Fechas simuladas para elegir entrega o retiro. */
-export function getDateOptions(mode: 'delivery' | 'pickup', now = new Date(), count = 4): DateOption[] {
+/** Fechas para elegir el retiro en tienda: hoy (listo en 1 hora) y los días siguientes. */
+export function getDateOptions(now = new Date(), count = 4): DateOption[] {
   const out: DateOption[] = [];
-  if (mode === 'delivery') {
-    for (let i = 0; i < count; i++) {
-      const d = addBusinessDays(now, 2 + i);
-      out.push({ iso: toISODate(d), label: formatDateShort(d), hint: i === 0 ? 'Más rápido' : 'Entre 9:00 y 18:00' });
-    }
-  } else {
-    for (let i = 0; i < count; i++) {
-      let d = addDays(now, 1 + i);
-      if (d.getDay() === 0) d = addDays(d, 1);
-      if (out.some((o) => o.iso === toISODate(d))) d = addDays(d, 1);
-      out.push({ iso: toISODate(d), label: formatDateShort(d), hint: i === 0 ? 'Listo en 2 horas' : 'Desde las 10:00' });
-    }
+  for (let i = 0; i < count; i++) {
+    const d = addDays(now, i);
+    out.push({ iso: toISODate(d), label: i === 0 ? 'Hoy' : formatDateShort(d), hint: i === 0 ? 'Listo en 1 hora' : 'Desde las 11:00' });
   }
   return out;
-}
-
-export function estimatedRange(now = new Date()) {
-  const a = addBusinessDays(now, 2);
-  const b = addBusinessDays(now, 4);
-  return `${formatDateShort(a)} y el ${formatDateShort(b)}`;
 }

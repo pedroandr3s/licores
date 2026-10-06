@@ -3,9 +3,9 @@ import OffersView from '@/components/OffersView';
 
 export const metadata: Metadata = {
   title: 'Ofertas',
-  description: 'Ofertas flash y descuentos de hasta 70% en perfumería, tecnología, hogar, limpieza y más en MIXMARKET.',
+  description: 'Ofertas en cervezas, vinos, destilados y snacks en Botillería Oasis, Quirihue. Retiro en tienda.',
   alternates: { canonical: '/ofertas' },
-  openGraph: { title: 'Ofertas de hasta 70% | MIXMARKET', description: 'Ofertas flash por tiempo limitado.' },
+  openGraph: { title: 'Ofertas | Botillería Oasis', description: 'Ofertas por tiempo limitado.' },
 };
 
 export default function OfertasPage() {

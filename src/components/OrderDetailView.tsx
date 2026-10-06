@@ -1,13 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Check, CreditCard, FastForward, HelpCircle, MapPin, Package, PackageCheck, Phone, Receipt, RotateCcw, Store, Truck } from 'lucide-react';
+import { Check, CreditCard, FastForward, HelpCircle, IdCard, MapPin, Package, PackageCheck, Phone, Receipt, RotateCcw, Store } from 'lucide-react';
 import type { OrderStatus } from '@/types';
 import { useStore } from '@/context/StoreContext';
 import { useUI } from '@/context/UIContext';
 import { getProduct } from '@/data/products';
 import { getStore } from '@/data/stores';
-import { deliveryLabel, nextStatus, statusFlow, STATUS_LABEL } from '@/lib/orders';
+import { nextStatus, STATUS_FLOW, STATUS_LABEL } from '@/lib/orders';
 import { formatDateTime, formatISOLong } from '@/lib/dates';
 import { formatCLP, cn } from '@/lib/format';
 import Breadcrumbs from './Breadcrumbs';
@@ -20,7 +20,6 @@ const STATUS_ICON: Record<OrderStatus, typeof Package> = {
   received: Receipt,
   preparing: Package,
   ready: Store,
-  shipping: Truck,
   delivered: PackageCheck,
 };
 
@@ -43,12 +42,11 @@ export default function OrderDetailView({ id }: { id: string }) {
     );
   }
 
-  const flow = statusFlow(order.delivery.mode);
+  const flow = STATUS_FLOW;
   const current = flow.indexOf(order.status);
   const next = nextStatus(order);
-  const store = getStore(order.delivery.storeId);
-  const pickup = order.delivery.mode === 'pickup';
-  const a = order.delivery.address;
+  const store = getStore(order.pickup.storeId);
+  const hasAlcohol = order.items.some((i) => getProduct(i.productId)?.isAlcohol);
 
   const reorder = () => {
     order.items.forEach((i) => dispatch({ type: 'CART_ADD', productId: i.productId, qty: i.qty }));
@@ -127,27 +125,24 @@ export default function OrderDetailView({ id }: { id: string }) {
 
         <div className="space-y-6">
           <section className="card p-5">
-            <h2 className="flex items-center gap-2 text-lg font-extrabold">{pickup ? <Store size={20} className="text-brand-600" /> : <Truck size={20} className="text-brand-600" />} {deliveryLabel(order.delivery.mode)}</h2>
+            <h2 className="flex items-center gap-2 text-lg font-extrabold"><Store size={20} className="text-brand-600" /> Retiro en tienda</h2>
             <div className="mt-3 space-y-1.5 text-[15px] text-ink-700">
-              {pickup && store ? (
+              {store && (
                 <>
                   <p className="font-bold">{store.name}</p>
                   <p className="flex items-start gap-2"><MapPin size={16} className="mt-1 shrink-0 text-ink-400" /> {store.address}</p>
                   <p className="flex items-center gap-2"><Phone size={16} className="shrink-0 text-ink-400" /> {store.phone}</p>
                   <p className="text-ink-500">{store.hoursLabel}</p>
                 </>
-              ) : (
-                a && (
-                  <>
-                    <p className="flex items-start gap-2"><MapPin size={16} className="mt-1 shrink-0 text-ink-400" /> {a.street} {a.number}{a.apartment ? `, ${a.apartment}` : ''}</p>
-                    <p className="pl-6">{a.comuna}, {a.region}</p>
-                    {a.notes && <p className="pl-6 text-ink-500">{a.notes}</p>}
-                  </>
-                )
               )}
               <p className="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-sm font-semibold text-brand-800">
-                {order.status === 'delivered' ? 'Entregado el' : pickup ? 'Retiro estimado:' : 'Entrega estimada:'} {formatISOLong(order.delivery.date)}
+                {order.status === 'delivered' ? 'Retirado el' : 'Retiro:'} {formatISOLong(order.pickup.date)}
               </p>
+              {hasAlcohol && order.status !== 'delivered' && (
+                <p className="flex items-start gap-2 rounded-lg bg-sun-100 px-3 py-2 text-sm font-semibold text-[#6b4700]">
+                  <IdCard size={16} className="mt-0.5 shrink-0" /> Presenta tu cédula: solo entregamos alcohol a mayores de 18 años.
+                </p>
+              )}
             </div>
           </section>
 
@@ -157,7 +152,7 @@ export default function OrderDetailView({ id }: { id: string }) {
             <dl className="mt-4 space-y-2 border-t border-ink-100 pt-4 text-[15px]">
               <div className="flex justify-between"><dt className="text-ink-600">Subtotal</dt><dd className="font-semibold">{formatCLP(order.subtotal)}</dd></div>
               <div className="flex justify-between"><dt className="text-ink-600">Descuentos</dt><dd className="font-semibold text-mint-700">-{formatCLP(order.discounts)}</dd></div>
-              <div className="flex justify-between"><dt className="text-ink-600">{pickup ? 'Retiro' : 'Despacho'}</dt><dd className="font-semibold">{order.shipping === 0 ? 'Gratis' : formatCLP(order.shipping)}</dd></div>
+              <div className="flex justify-between"><dt className="text-ink-600">Retiro en tienda</dt><dd className="font-semibold text-mint-700">Gratis</dd></div>
               <div className="flex items-end justify-between border-t border-ink-100 pt-3"><dt className="font-extrabold">Total</dt><dd className="font-display text-2xl font-extrabold">{formatCLP(order.total)}</dd></div>
             </dl>
             <p className="mt-3 text-sm text-ink-500">Con este pedido sumaste {order.pointsEarned.toLocaleString('es-CL')} puntos del Club.</p>

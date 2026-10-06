@@ -14,16 +14,16 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: '#f5f1ff',
-          100: '#ebe3ff',
-          200: '#d8c8ff',
-          300: '#bda0ff',
-          400: '#9b6fff',
-          500: '#7b45f5',
-          600: '#6428e0',
-          700: '#5120bb',
-          800: '#421b97',
-          900: '#2c1266',
+          50: '#eef6fd',
+          100: '#d8eaf9',
+          200: '#b3d6f2',
+          300: '#82bbe8',
+          400: '#4d9bdb',
+          500: '#2a7fc4',
+          600: '#1a68a8',
+          700: '#15548a',
+          800: '#134571',
+          900: '#0f2f4d',
         },
         coral: {
           50: '#fff2ef',
@@ -36,12 +36,12 @@ const config: Config = {
           700: '#bf2610',
         },
         sun: {
-          100: '#fff4c9',
-          200: '#ffe992',
-          300: '#ffdc5e',
-          400: '#ffcf3a',
-          500: '#f9bd0d',
-          600: '#d99a00',
+          100: '#fdeccd',
+          200: '#fbd998',
+          300: '#f8c25f',
+          400: '#f5a623',
+          500: '#e08f10',
+          600: '#bf7408',
         },
         mint: {
           50: '#e8faf2',
@@ -70,7 +70,7 @@ const config: Config = {
       boxShadow: {
         card: '0 1px 2px rgba(20,18,43,.04), 0 4px 16px rgba(20,18,43,.06)',
         pop: '0 12px 40px rgba(20,18,43,.18)',
-        lift: '0 8px 28px rgba(100,40,224,.18)',
+        lift: '0 8px 28px rgba(26,104,168,.2)',
       },
       keyframes: {
         shimmer: { '100%': { transform: 'translateX(100%)' } },

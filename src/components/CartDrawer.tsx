@@ -3,18 +3,15 @@
 import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import { useUI } from '@/context/UIContext';
-import { useCartTotals, useStore } from '@/context/StoreContext';
+import { useCartTotals } from '@/context/StoreContext';
 import { formatCLP } from '@/lib/format';
-import { FREE_SHIPPING_THRESHOLD } from '@/lib/constants';
 import Drawer from './ui/Drawer';
 import CartItem from './CartItem';
 
 export default function CartDrawer() {
   const { cartOpen, closeCart } = useUI();
-  const { deliveryMode } = useStore();
   const totals = useCartTotals();
   const empty = totals.lines.length === 0;
-  const pct = Math.min(100, Math.round((totals.itemsTotal / FREE_SHIPPING_THRESHOLD) * 100));
 
   return (
     <Drawer
@@ -28,7 +25,7 @@ export default function CartDrawer() {
               <span className="font-semibold text-ink-600">Subtotal</span>
               <span className="font-display text-2xl font-extrabold">{formatCLP(totals.itemsTotal)}</span>
             </div>
-            <p className="text-xs text-ink-500">El despacho se calcula en el siguiente paso.</p>
+            <p className="text-xs text-ink-500">Solo retiro en tienda · sin costo de despacho.</p>
             <div className="grid grid-cols-2 gap-2.5">
               <Link href="/carrito" onClick={closeCart} className="btn btn-outline">Ver carrito</Link>
               <Link href="/checkout" onClick={closeCart} className="btn btn-primary">Continuar compra</Link>
@@ -46,15 +43,6 @@ export default function CartDrawer() {
         </div>
       ) : (
         <div className="px-5">
-          {deliveryMode === 'delivery' && !totals.shippingIsFree && (
-            <div className="mt-4 rounded-xl bg-brand-50 p-3.5">
-              <p className="text-sm font-semibold text-brand-800">Te faltan {formatCLP(totals.freeShippingRemaining)} para despacho gratis</p>
-              <div className="mt-2 h-2 overflow-hidden rounded-full bg-white"><div className="h-full rounded-full bg-brand-600 transition-all" style={{ width: `${pct}%` }} /></div>
-            </div>
-          )}
-          {deliveryMode === 'delivery' && totals.shippingIsFree && (
-            <p className="mt-4 rounded-xl bg-mint-50 p-3.5 text-sm font-semibold text-mint-700">¡Tu compra tiene despacho gratis!</p>
-          )}
           <ul className="divide-y divide-ink-100">
             {totals.lines.map(({ product, qty }) => (
               <li key={product.id}><CartItem product={product} qty={qty} compact onNavigate={closeCart} /></li>

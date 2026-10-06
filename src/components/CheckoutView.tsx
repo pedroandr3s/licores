@@ -3,11 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, CreditCard, Landmark, Loader2, Lock, Pencil, ShieldCheck, ShoppingBag, TriangleAlert, Wallet } from 'lucide-react';
-import type { Address, Order, PaymentMethod } from '@/types';
-import { regions } from '@/data/regions';
-import { getStore } from '@/data/stores';
-import { cartStoreAvailability } from '@/lib/availability';
+import { ChevronDown, Clock, CreditCard, IdCard, Landmark, Loader2, Lock, MapPin, Pencil, ShieldCheck, ShoppingBag, Store as StoreIcon, Wallet } from 'lucide-react';
+import type { Order, PaymentMethod } from '@/types';
+import { store } from '@/data/stores';
+import { MIN_AGE } from '@/lib/constants';
 import { getDateOptions, formatISOLong } from '@/lib/dates';
 import { formatCLP, cn } from '@/lib/format';
 import { formatRut, validateRut } from '@/lib/rut';
@@ -17,16 +16,14 @@ import { useUI } from '@/context/UIContext';
 import { useMounted } from '@/hooks/useMounted';
 import Breadcrumbs from './Breadcrumbs';
 import CheckoutSteps from './CheckoutSteps';
-import DeliverySelector from './DeliverySelector';
 import OrderSummary from './OrderSummary';
 import EmptyState from './EmptyState';
 import { CheckField, SelectField, TextField } from './Field';
 import { BlockSkeleton } from './Skeletons';
 
 type Errors = Record<string, string>;
-const STEPS = ['Entrega', 'Tus datos', 'Pago', 'Confirmación'];
+const STEPS = ['Retiro', 'Tus datos', 'Pago', 'Confirmación'];
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const CONFLICT_MSG = 'Tu carrito mezcla productos que solo se retiran con otros que solo se despachan.';
 
 const formatCard = (v: string) => v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
 const formatExpiry = (v: string) => {
@@ -45,11 +42,12 @@ const METHODS: { id: PaymentMethod; label: string; sub: string; icon: typeof Cre
   { id: 'debit', label: 'Tarjeta de débito', sub: 'Cargo inmediato', icon: Wallet },
   { id: 'transfer', label: 'Transferencia', sub: 'Pagas desde tu banco', icon: Landmark },
   { id: 'webpay', label: 'Webpay', sub: 'Paga en el portal seguro', icon: ShieldCheck },
+  { id: 'store', label: 'Pago en tienda', sub: 'Pagas al retirar, con tarjeta o efectivo', icon: StoreIcon },
 ];
 
 export default function CheckoutView() {
   const router = useRouter();
-  const { hydrated, user, deliveryMode, selectedStoreId, addresses, dispatch } = useStore();
+  const { hydrated, user, dispatch } = useStore();
   const { toast, openLogin } = useUI();
   const totals = useCartTotals();
   const mounted = useMounted();
@@ -57,20 +55,13 @@ export default function CheckoutView() {
   const [step, setStep] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
-  const [addr, setAddr] = useState({ region: 'Ñuble', comuna: '', street: '', number: '', apartment: '', notes: '' });
-  const [saveAddr, setSaveAddr] = useState(false);
   const [dateISO, setDateISO] = useState('');
-  const [cust, setCust] = useState({ name: '', lastName: '', rut: '', phone: '', email: '', newsletter: false });
+  const [cust, setCust] = useState({ name: '', lastName: '', rut: '', phone: '', email: '', newsletter: false, ageOk: false });
   const [pay, setPay] = useState({ method: '' as PaymentMethod | '', number: '', holder: '', expiry: '', cvv: '', installments: '1', accept: false });
   const prefilled = useRef(false);
 
-  const products = useMemo(() => totals.lines.map((l) => l.product), [totals.lines]);
-  const canDelivery = products.every((p) => p.availableForDelivery);
-  const canPickup = products.every((p) => p.availableForPickup);
-  const conflict = !canDelivery && !canPickup;
-  const mode = deliveryMode;
-  const dateOptions = useMemo(() => (mounted ? getDateOptions(mode) : []), [mounted, mode]);
-  const store = getStore(selectedStoreId);
+  const hasAlcohol = totals.hasAlcohol;
+  const dateOptions = useMemo(() => (mounted ? getDateOptions() : []), [mounted]);
 
   // Prefill con los datos del usuario simulado
   useEffect(() => {
@@ -85,48 +76,19 @@ export default function CheckoutView() {
     }));
   }, [hydrated, user]);
 
-  // Si la modalidad actual no aplica al carrito, cambiar a la otra
-  useEffect(() => {
-    if (!hydrated || products.length === 0) return;
-    if (mode === 'delivery' && !canDelivery && canPickup) dispatch({ type: 'SET_MODE', mode: 'pickup' });
-    if (mode === 'pickup' && !canPickup && canDelivery) dispatch({ type: 'SET_MODE', mode: 'delivery' });
-  }, [hydrated, products.length, mode, canDelivery, canPickup, dispatch]);
-
-  // Tienda por defecto para retiro
-  useEffect(() => {
-    if (!hydrated || mode !== 'pickup' || products.length === 0) return;
-    const current = selectedStoreId && cartStoreAvailability(products, selectedStoreId) !== 'none';
-    if (!current) {
-      const fallback = ['san-carlos', 'chillan-centro', 'chillan-norte', 'bulnes', 'yungay'].find((id) => cartStoreAvailability(products, id) !== 'none');
-      dispatch({ type: 'SET_STORE', storeId: fallback ?? null });
-    }
-  }, [hydrated, mode, products, selectedStoreId, dispatch]);
-
   // Fecha por defecto
   useEffect(() => {
     if (dateOptions.length && !dateOptions.some((o) => o.iso === dateISO)) setDateISO(dateOptions[0].iso);
   }, [dateOptions, dateISO]);
 
   const clear = (k: string) => errors[k] && setErrors((e) => ({ ...e, [k]: '' }));
-  const setA = (k: keyof typeof addr, v: string) => { setAddr((a) => ({ ...a, [k]: v, ...(k === 'region' ? { comuna: '' } : {}) })); clear(k); };
   const setC = (k: keyof typeof cust, v: string | boolean) => { setCust((c) => ({ ...c, [k]: v })); clear(k); };
   const setP = (k: keyof typeof pay, v: string | boolean) => { setPay((p) => ({ ...p, [k]: v })); clear(k); };
 
-  const comunas = regions.find((r) => r.name === addr.region)?.comunas ?? [];
-
   /* ───────── validaciones ───────── */
-  const validateDelivery = (): Errors => {
+  const validatePickup = (): Errors => {
     const er: Errors = {};
-    if (conflict) er.conflict = CONFLICT_MSG;
-    if (mode === 'delivery') {
-      if (!addr.region) er.region = 'Selecciona tu región';
-      if (!addr.comuna) er.comuna = 'Selecciona tu comuna';
-      if (addr.street.trim().length < 3) er.street = 'Ingresa el nombre de tu calle';
-      if (!addr.number.trim()) er.number = 'Ingresa el número';
-    } else if (!selectedStoreId || cartStoreAvailability(products, selectedStoreId) === 'none') {
-      er.store = 'Selecciona una tienda con disponibilidad';
-    }
-    if (!dateISO) er.date = 'Selecciona una fecha';
+    if (!dateISO) er.date = 'Selecciona un día de retiro';
     return er;
   };
 
@@ -137,6 +99,7 @@ export default function CheckoutView() {
     if (!validateRut(cust.rut)) er.rut = 'Ingresa un RUT válido, por ejemplo 12.345.678-5';
     if (!/^9\d{8}$/.test(cust.phone.replace(/\D/g, ''))) er.phone = 'Ingresa un celular de 9 dígitos que parta con 9';
     if (!EMAIL_RE.test(cust.email.trim())) er.email = 'Ingresa un correo válido, por ejemplo nombre@correo.cl';
+    if (hasAlcohol && !cust.ageOk) er.ageOk = `Debes confirmar que tienes ${MIN_AGE} años o más para comprar alcohol`;
     return er;
   };
 
@@ -176,8 +139,9 @@ export default function CheckoutView() {
           ? `${PAYMENT_LABEL[method]} •••• ${last4}`
           : method === 'transfer'
             ? 'Transferencia bancaria'
-            : 'Webpay';
-      const address: Address = { id: `addr-${now.getTime()}`, label: 'Despacho', region: addr.region, comuna: addr.comuna, street: addr.street.trim(), number: addr.number.trim(), apartment: addr.apartment.trim() || undefined, notes: addr.notes.trim() || undefined };
+            : method === 'store'
+              ? 'Pago en tienda'
+              : 'Webpay';
       const order: Order = {
         id: generateOrderId(now),
         createdAt: now.toISOString(),
@@ -185,14 +149,13 @@ export default function CheckoutView() {
         items: totals.lines.map(({ product, qty }) => ({ productId: product.id, name: product.name, brand: product.brand, price: product.price, originalPrice: product.originalPrice, qty })),
         subtotal: totals.subtotal,
         discounts: totals.discounts,
-        shipping: totals.shipping,
         total: totals.total,
-        delivery: mode === 'pickup' ? { mode, storeId: selectedStoreId ?? undefined, date: dateISO } : { mode, address, date: dateISO },
+        pickup: { storeId: store.id, date: dateISO },
+        ageConfirmed: hasAlcohol ? cust.ageOk : true,
         customer: { name: cust.name.trim(), lastName: cust.lastName.trim(), rut: formatRut(cust.rut), phone: `+56 ${cust.phone.trim()}`, email: cust.email.trim(), newsletter: cust.newsletter },
         payment: { method, label },
         pointsEarned: Math.floor(totals.total / 100),
       };
-      if (saveAddr && user && mode === 'delivery') dispatch({ type: 'ADDR_ADD', address: { ...address, label: `Dirección ${addresses.length + 1}` } });
       dispatch({ type: 'ORDER_ADD', order });
       router.push(`/checkout/confirmacion?pedido=${order.id}`);
     }, 1600);
@@ -202,7 +165,7 @@ export default function CheckoutView() {
     e.preventDefault();
     if (processing) return;
     if (step === 0) {
-      const er = validateDelivery();
+      const er = validatePickup();
       setErrors(er);
       if (Object.keys(er).length === 0) goStep(1);
     } else if (step === 1) {
@@ -234,9 +197,9 @@ export default function CheckoutView() {
 
   /* ───────── piezas de UI ───────── */
   const dateChooser = (
-    <div className={cn(mode === 'delivery' && 'mt-5')}>
-      <p className="text-sm font-bold text-ink-700">{mode === 'delivery' ? 'Fecha estimada de entrega' : 'Fecha de retiro'}</p>
-      <div role="radiogroup" aria-label="Fecha" className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
+    <div>
+      <p className="text-sm font-bold text-ink-700">Día de retiro</p>
+      <div role="radiogroup" aria-label="Día de retiro" className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {dateOptions.length === 0
           ? Array.from({ length: 4 }).map((_, i) => <div key={i} className="skeleton h-[62px]" />)
           : dateOptions.map((o) => (
@@ -257,43 +220,7 @@ export default function CheckoutView() {
     </div>
   );
 
-  const addressForm = (
-    <div>
-      {addresses.length > 0 && (
-        <SelectField
-          id="saved-address"
-          label="Usar una dirección guardada"
-          className="mb-4"
-          value=""
-          placeholder="Selecciona una dirección"
-          options={addresses.map((a) => ({ value: a.id, label: `${a.label} — ${a.street} ${a.number}, ${a.comuna}` }))}
-          onChange={(id) => {
-            const a = addresses.find((x) => x.id === id);
-            if (a) setAddr({ region: a.region, comuna: a.comuna, street: a.street, number: a.number, apartment: a.apartment ?? '', notes: a.notes ?? '' });
-          }}
-        />
-      )}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <SelectField id="region" label="Región" value={addr.region} onChange={(v) => setA('region', v)} options={regions.map((r) => ({ value: r.name, label: r.name }))} error={errors.region} autoComplete="address-level1" />
-        <SelectField id="comuna" label="Comuna" value={addr.comuna} onChange={(v) => setA('comuna', v)} options={comunas.map((c) => ({ value: c, label: c }))} placeholder="Selecciona tu comuna" error={errors.comuna} autoComplete="address-level2" />
-        <TextField id="street" label="Calle" value={addr.street} onChange={(v) => setA('street', v)} error={errors.street} autoComplete="address-line1" placeholder="Av. Libertad" />
-        <div className="grid grid-cols-2 gap-4">
-          <TextField id="number" label="Número" value={addr.number} onChange={(v) => setA('number', v)} error={errors.number} inputMode="numeric" placeholder="1234" />
-          <TextField id="apartment" label="Departamento" value={addr.apartment} onChange={(v) => setA('apartment', v)} optional placeholder="52" />
-        </div>
-        <TextField id="notes" label="Información adicional" className="sm:col-span-2" value={addr.notes} onChange={(v) => setA('notes', v)} optional placeholder="Ej.: dejar con conserjería, timbre malo" />
-      </div>
-      {user && (
-        <div className="mt-4"><CheckField id="save-address" checked={saveAddr} onChange={setSaveAddr}>Guardar esta dirección en mi cuenta</CheckField></div>
-      )}
-      {dateChooser}
-    </div>
-  );
-
-  const summaryDelivery =
-    mode === 'pickup'
-      ? `Retiro en ${store?.name ?? 'tienda'}`
-      : `Despacho a ${addr.street} ${addr.number}${addr.apartment ? `, ${addr.apartment}` : ''}, ${addr.comuna}`;
+  const summaryDelivery = `Retiro en ${store.name}`;
 
   const primaryLabel = step === 0 ? 'Continuar a tus datos' : step === 1 ? 'Continuar al pago' : 'Confirmar compra';
 
@@ -310,7 +237,7 @@ export default function CheckoutView() {
           <span className="flex items-center gap-2 font-extrabold"><ShoppingBag size={18} className="text-brand-600" /> Resumen del pedido <ChevronDown size={16} className="transition-transform group-open:rotate-180" /></span>
           <span className="font-display text-xl font-extrabold">{formatCLP(totals.total)}</span>
         </summary>
-        <div className="border-t border-ink-100 p-3"><OrderSummary lines={totals.lines} totals={totals} mode={mode} showItems showProgress={false} title="Tu compra" /></div>
+        <div className="border-t border-ink-100 p-3"><OrderSummary lines={totals.lines} totals={totals} showItems title="Tu compra" /></div>
       </details>
 
       <div className="mt-5 grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
@@ -333,38 +260,27 @@ export default function CheckoutView() {
 
           {step === 0 && (
             <>
-              <h2 className="text-2xl font-extrabold">¿Cómo quieres recibir tu compra?</h2>
-              <p className="mt-1 text-ink-500">Elige despacho a domicilio o retiro gratis en una tienda.</p>
-              {conflict && (
-                <div role="alert" className="mt-4 flex gap-3 rounded-2xl border border-coral-200 bg-coral-50 p-4 text-sm text-coral-700">
-                  <TriangleAlert size={20} className="mt-0.5 shrink-0" />
-                  <div>
-                    <p className="font-bold">{CONFLICT_MSG}</p>
-                    <p className="mt-1">Elimina alguno de estos productos del carrito para continuar:</p>
-                    <ul className="mt-1 list-disc pl-5">
-                      {totals.lines.filter((l) => !l.product.availableForDelivery || !l.product.availableForPickup).map((l) => (
-                        <li key={l.product.id}>{l.product.name} ({!l.product.availableForDelivery ? 'solo retiro' : 'solo despacho'})</li>
-                      ))}
-                    </ul>
-                    <Link href="/carrito" className="mt-2 inline-block font-bold underline">Ir al carrito</Link>
+              <h2 className="text-2xl font-extrabold">Retira tu pedido en el local</h2>
+              <p className="mt-1 text-ink-500">No tenemos despacho a domicilio: todas las compras se retiran gratis en tienda.</p>
+              <div className="mt-5 rounded-2xl border border-brand-600 bg-white p-4 ring-2 ring-brand-600/20">
+                <div className="flex gap-3.5">
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-600 text-white"><StoreIcon size={22} /></span>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-base font-extrabold text-ink-900">{store.name}</p>
+                      <span className="badge bg-mint-50 text-mint-700">Gratis</span>
+                    </div>
+                    <p className="mt-1 flex items-start gap-1.5 text-sm text-ink-600"><MapPin size={14} className="mt-[3px] shrink-0 text-ink-400" /> {store.address}</p>
+                    <p className="mt-0.5 flex items-start gap-1.5 text-sm text-ink-600"><Clock size={14} className="mt-[3px] shrink-0 text-ink-400" /> {store.hoursLabel}</p>
                   </div>
                 </div>
-              )}
-              <div className="mt-5">
-                <DeliverySelector
-                  mode={mode}
-                  onModeChange={(m) => { dispatch({ type: 'SET_MODE', mode: m }); setErrors({}); }}
-                  storeId={selectedStoreId}
-                  onStoreChange={(id) => { dispatch({ type: 'SET_STORE', storeId: id }); clear('store'); }}
-                  cartProducts={products}
-                  disabledModes={{
-                    delivery: !canDelivery ? 'Algunos productos de tu carrito solo se retiran en tienda' : undefined,
-                    pickup: !canPickup ? 'Algunos productos de tu carrito solo se despachan' : undefined,
-                  }}
-                  deliveryExtra={addressForm}
-                  pickupExtra={<div className="mt-5">{errors.store && <p className="field-error mb-3">{errors.store}</p>}{dateChooser}</div>}
-                />
+                <div className="mt-5 border-t border-ink-100 pt-4">{dateChooser}</div>
               </div>
+              {hasAlcohol && (
+                <p className="mt-4 flex items-start gap-2.5 rounded-2xl bg-sun-100 p-4 text-sm font-semibold text-[#6b4700]">
+                  <IdCard size={19} className="mt-0.5 shrink-0" /> Tu pedido incluye alcohol. Quien retire debe ser mayor de {MIN_AGE} años y presentar su cédula de identidad.
+                </p>
+              )}
             </>
           )}
 
@@ -384,8 +300,15 @@ export default function CheckoutView() {
                 <TextField id="c-phone" label="Teléfono" prefix="+56" value={cust.phone} onChange={(v) => setC('phone', formatPhone(v))} error={errors.phone} inputMode="tel" autoComplete="tel-national" placeholder="9 1234 5678" />
                 <TextField id="c-email" label="Email" className="sm:col-span-2" type="email" value={cust.email} onChange={(v) => setC('email', v)} error={errors.email} autoComplete="email" placeholder="nombre@correo.cl" />
               </div>
+              {hasAlcohol && (
+                <div className="mt-5 rounded-2xl border border-sun-300 bg-sun-100/60 p-4">
+                  <CheckField id="c-age" checked={cust.ageOk} onChange={(v) => setC('ageOk', v)} error={errors.ageOk}>
+                    Declaro que tengo {MIN_AGE} años o más y que presentaré mi cédula de identidad vigente al retirar el pedido.
+                  </CheckField>
+                </div>
+              )}
               <div className="mt-5"><CheckField id="c-news" checked={cust.newsletter} onChange={(v) => setC('newsletter', v)}>Quiero recibir novedades y promociones</CheckField></div>
-              <button type="button" onClick={() => { setCust({ name: 'Andrés', lastName: 'Soto', rut: '12.345.678-5', phone: '9 8765 4321', email: 'andres.soto@correo.cl', newsletter: true }); setErrors({}); }} className="mt-4 text-sm font-bold text-brand-700 hover:underline">
+              <button type="button" onClick={() => { setCust({ name: 'Andrés', lastName: 'Soto', rut: '12.345.678-5', phone: '9 8765 4321', email: 'andres.soto@correo.cl', newsletter: true, ageOk: hasAlcohol }); setErrors({}); }} className="mt-4 text-sm font-bold text-brand-700 hover:underline">
                 Autocompletar con datos de demostración
               </button>
             </>
@@ -432,7 +355,7 @@ export default function CheckoutView() {
                   <dl className="mt-3 grid grid-cols-[120px_1fr] gap-y-1.5">
                     <dt className="text-ink-500">Banco</dt><dd className="font-semibold">Banco Demo</dd>
                     <dt className="text-ink-500">Cuenta</dt><dd className="font-semibold">Corriente 000-0000-00</dd>
-                    <dt className="text-ink-500">Titular</dt><dd className="font-semibold">MIXMARKET Demo SpA</dd>
+                    <dt className="text-ink-500">Titular</dt><dd className="font-semibold">Oasis Demo SpA</dd>
                     <dt className="text-ink-500">Monto</dt><dd className="font-semibold">{formatCLP(totals.total)}</dd>
                   </dl>
                   <p className="mt-3 text-sm text-ink-500">En una tienda real, tu pedido quedaría pendiente hasta confirmar el pago.</p>
@@ -456,14 +379,14 @@ export default function CheckoutView() {
           {/* Botones (desktop) */}
           <div className="mt-7 hidden items-center justify-between gap-3 border-t border-ink-100 pt-5 lg:flex">
             {step > 0 ? <button type="button" onClick={() => goStep(step - 1)} className="btn btn-ghost">Volver</button> : <Link href="/carrito" className="btn btn-ghost">Volver al carrito</Link>}
-            <button type="submit" disabled={processing || (step === 0 && conflict)} className="btn btn-primary btn-lg min-w-[260px]">
+            <button type="submit" disabled={processing} className="btn btn-primary btn-lg min-w-[260px]">
               {processing ? <><Loader2 size={20} className="animate-spin" /> Procesando…</> : primaryLabel}
             </button>
           </div>
         </form>
 
         <div className="hidden lg:sticky lg:top-[152px] lg:block">
-          <OrderSummary lines={totals.lines} totals={totals} mode={mode} showItems title="Tu compra">
+          <OrderSummary lines={totals.lines} totals={totals} showItems title="Tu compra">
             <Link href="/carrito" className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 hover:underline"><Pencil size={13} /> Editar carrito</Link>
           </OrderSummary>
         </div>
@@ -477,7 +400,7 @@ export default function CheckoutView() {
             <p className="text-xs font-semibold text-ink-500">Total</p>
             <p className="font-display text-xl font-extrabold">{formatCLP(totals.total)}</p>
           </div>
-          <button type="submit" form="checkout-form" disabled={processing || (step === 0 && conflict)} className="btn btn-primary h-12 flex-1">
+          <button type="submit" form="checkout-form" disabled={processing} className="btn btn-primary h-12 flex-1">
             {processing ? <><Loader2 size={19} className="animate-spin" /> Procesando…</> : primaryLabel}
           </button>
         </div>

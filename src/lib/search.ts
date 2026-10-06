@@ -79,4 +79,4 @@ export function searchProducts(query: string, list?: Product[]): Product[] {
   return scored.sort((a, b) => b.score - a.score || b.p.sold - a.p.sold).map((s) => s.p);
 }
 
-export const POPULAR_SEARCHES = ['shampoo', 'perfume', 'detergente', 'audífonos', 'pañales', 'café'];
+export const POPULAR_SEARCHES = ['cerveza', 'pisco', 'vino', 'whisky', 'papas fritas', 'hielo'];

@@ -17,9 +17,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!c) return { title: 'Categoría no encontrada' };
   return {
     title: c.name,
-    description: `${c.tagline}. Compra ${c.name.toLowerCase()} en MIXMARKET con despacho a domicilio o retiro en tienda.`,
+    description: `${c.tagline}. Compra ${c.name.toLowerCase()} en Botillería Oasis y retira en el local de Quirihue.`,
     alternates: { canonical: `/productos/${c.slug}` },
-    openGraph: { title: `${c.name} | MIXMARKET`, description: c.tagline },
+    openGraph: { title: `${c.name} | Oasis`, description: c.tagline },
   };
 }
 

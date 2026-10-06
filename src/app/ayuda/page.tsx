@@ -1,19 +1,19 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ChevronDown, Package, RotateCcw, Truck, MessageCircle } from 'lucide-react';
+import { ChevronDown, Package, RotateCcw, Store, MessageCircle } from 'lucide-react';
 import { faqs } from '@/data/content';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Ayuda y preguntas frecuentes',
-  description: 'Resuelve tus dudas sobre compras, despacho, retiro en tienda, pagos, cambios y devoluciones en MIXMARKET.',
+  description: 'Resuelve tus dudas sobre compras, retiro en tienda, pagos, cambios y venta de alcohol en Botillería Oasis.',
   alternates: { canonical: '/ayuda' },
 };
 
 const quick = [
   { href: '/mis-pedidos', icon: Package, title: 'Seguir mi pedido', text: 'Revisa el estado de tus compras.' },
-  { href: '/ayuda/politicas-de-despacho', icon: Truck, title: 'Despacho y retiro', text: 'Costos, plazos y cobertura.' },
-  { href: '/ayuda/cambios-y-devoluciones', icon: RotateCcw, title: 'Cambios y devoluciones', text: '30 días para cambiar tu producto.' },
+  { href: '/ayuda/politicas-de-retiro', icon: Store, title: 'Retiro en tienda', text: 'Plazos y qué debes llevar.' },
+  { href: '/ayuda/cambios-y-devoluciones', icon: RotateCcw, title: 'Cambios y devoluciones', text: 'Botellas dañadas o fallas de fábrica.' },
   { href: '/ayuda/contacto', icon: MessageCircle, title: 'Contacto', text: 'Escríbenos o visítanos en tienda.' },
 ];
 

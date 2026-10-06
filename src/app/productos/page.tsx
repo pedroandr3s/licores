@@ -5,9 +5,9 @@ import { ProductGridSkeleton } from '@/components/Skeletons';
 
 export const metadata: Metadata = {
   title: 'Productos',
-  description: 'Explora todo el catálogo de MIXMARKET: perfumería, cuidado personal, limpieza, hogar, tecnología, snacks, bebidas, mascotas, belleza e infantil.',
+  description: 'Catálogo de Botillería Oasis: cervezas, vinos, destilados, licores, bebidas y papas fritas. Retiro en tienda en Quirihue.',
   alternates: { canonical: '/productos' },
-  openGraph: { title: 'Productos | MIXMARKET', description: 'Todo el catálogo MIXMARKET con filtros por precio, marca y disponibilidad.' },
+  openGraph: { title: 'Productos | Botillería Oasis', description: 'Todo el catálogo con filtros por precio, marca y tipo.' },
 };
 
 export default function ProductosPage() {

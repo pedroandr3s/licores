@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  ChevronDown, CircleUser, Flame, Heart, HelpCircle, LogOut, MapPin, Menu, Package, ShoppingBag, Store, Tag, User, Crown, Sparkles, ChevronRight, MapPinned,
+  ChevronDown, CircleUser, Flame, Heart, HelpCircle, LogOut, MapPin, Menu, Package, ShoppingBag, Tag, User, ChevronRight,
 } from 'lucide-react';
 import { categories } from '@/data/categories';
-import { getStore } from '@/data/stores';
+import { store } from '@/data/stores';
 import { useStore, useCartTotals } from '@/context/StoreContext';
 import { useUI } from '@/context/UIContext';
 import { formatCLP } from '@/lib/format';
@@ -30,10 +30,10 @@ export function PromoBar() {
     <div className="bg-ink-900 text-[13px] text-white">
       <div className="container-page flex h-9 items-center justify-between gap-4">
         <p className="truncate font-medium">
-          <span className="font-bold text-sun-300">Despacho gratis</span> desde $30.000<span className="hidden sm:inline"> · Retira en tienda en 2 horas</span>
+          <span className="font-bold text-sun-300">Solo retiro en tienda</span> · Listo en 1 hora<span className="hidden sm:inline"> · Venta solo a mayores de 18 años</span>
         </p>
         <nav className="hidden items-center gap-5 font-semibold md:flex" aria-label="Enlaces rápidos">
-          <Link href="/tiendas" className="hover:text-sun-300">Tiendas</Link>
+          <Link href="/donde-encontrarnos" className="hover:text-sun-300">Dónde encontrarnos</Link>
           <Link href="/mis-pedidos" className="hover:text-sun-300">Seguir mi pedido</Link>
           <Link href="/ayuda" className="hover:text-sun-300">Ayuda</Link>
         </nav>
@@ -44,14 +44,13 @@ export function PromoBar() {
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, favorites, selectedStoreId, dispatch } = useStore();
-  const { openCart, openLogin, openStoreModal, menuOpen, setMenuOpen, toast } = useUI();
+  const { user, favorites, dispatch } = useStore();
+  const { openCart, openLogin, menuOpen, setMenuOpen, toast } = useUI();
   const totals = useCartTotals();
   const [megaOpen, setMegaOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [openCat, setOpenCat] = useState<string | null>(null);
   const userRef = useRef<HTMLDivElement>(null);
-  const store = getStore(selectedStoreId);
 
   useEffect(() => {
     setMegaOpen(false);
@@ -114,18 +113,17 @@ export default function Header() {
             </button>
             <div className="shrink-0"><Logo tone="light" /></div>
 
-            <button
-              type="button"
-              onClick={openStoreModal}
+            <Link
+              href="/donde-encontrarnos"
               className="hidden shrink-0 items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-left hover:bg-white/10 xl:flex"
-              aria-label="Cambiar tienda de retiro"
+              aria-label="Ver nuestro local"
             >
               <MapPin size={22} className="text-sun-300" />
               <span className="leading-tight">
                 <span className="block text-xs text-brand-100">Retira en</span>
-                <span className="flex items-center gap-1 text-sm font-bold">{store ? store.shortName : 'Elige tu tienda'} <ChevronDown size={14} /></span>
+                <span className="block text-sm font-bold">{store.shortName}</span>
               </span>
-            </button>
+            </Link>
 
             <div className="hidden min-w-0 flex-1 lg:block"><SearchBar id="search-desktop" /></div>
 
@@ -162,7 +160,6 @@ export default function Header() {
                       { href: '/cuenta', label: 'Mi cuenta', icon: CircleUser },
                       { href: '/mis-pedidos', label: 'Mis pedidos', icon: Package },
                       { href: '/favoritos', label: 'Favoritos', icon: Heart },
-                      { href: '/cuenta?tab=direcciones', label: 'Direcciones', icon: MapPinned },
                     ].map((i) => (
                       <Link key={i.href} href={i.href} role="menuitem" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold hover:bg-brand-50 hover:text-brand-700">
                         <i.icon size={18} className="text-ink-400" /> {i.label}
@@ -207,16 +204,13 @@ export default function Header() {
               aria-controls="mega-menu"
               className={`inline-flex h-11 items-center gap-2 pr-4 text-[15px] font-extrabold transition-colors ${megaOpen ? 'text-brand-700' : 'text-ink-900 hover:text-brand-700'}`}
             >
-              <Menu size={18} /> Categorías <ChevronDown size={15} className={`transition-transform ${megaOpen ? 'rotate-180' : ''}`} />
+              <Menu size={18} /> Productos <ChevronDown size={15} className={`transition-transform ${megaOpen ? 'rotate-180' : ''}`} />
             </button>
           </div>
           {navLink('/ofertas', 'Ofertas', <Flame size={17} className="text-coral-500" />)}
-          {navLink('/nuevos', 'Nuevos')}
-          {navLink('/marcas', 'Marcas')}
-          {navLink('/club', 'Club MixMarket', <Crown size={17} className="text-sun-600" />)}
+          {navLink('/donde-encontrarnos', 'Dónde encontrarnos', <MapPin size={17} className="text-ink-400" />)}
           {navLink('/ayuda', 'Ayuda')}
           <div className="ml-auto flex items-center">
-            {navLink('/tiendas', 'Tiendas', <Store size={17} className="text-ink-400" />)}
             {navLink('/mis-pedidos', 'Mis pedidos', <Package size={17} className="text-ink-400" />)}
           </div>
         </div>
@@ -245,9 +239,9 @@ export default function Header() {
               </div>
               <Link href="/ofertas" className="relative flex flex-col justify-end overflow-hidden rounded-2xl bg-gradient-to-br from-brand-700 to-brand-500 p-5 text-white">
                 <span className="absolute -right-8 -top-8 h-36 w-36 rounded-full bg-sun-400/90" aria-hidden />
-                <span className="absolute right-3 top-3 font-display text-5xl font-extrabold text-ink-900">70%</span>
-                <span className="font-display text-xl font-extrabold leading-tight">Ofertas flash</span>
-                <span className="mt-1 text-sm text-brand-100">Hasta 70% de descuento por tiempo limitado.</span>
+                <span className="absolute right-3 top-3 font-display text-4xl font-extrabold text-ink-900">Ofertas</span>
+                <span className="font-display text-xl font-extrabold leading-tight">Ofertas de la semana</span>
+                <span className="mt-1 text-sm text-brand-100">Packs y botellas con descuento por tiempo limitado.</span>
                 <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-lg bg-white px-3 py-1.5 text-sm font-bold text-brand-700">Ver ofertas <ChevronRight size={14} /></span>
               </Link>
             </div>
@@ -273,22 +267,21 @@ export default function Header() {
                 <button type="button" className="btn btn-outline flex-1" onClick={() => { setMenuOpen(false); openLogin('register'); }}>Crear cuenta</button>
               </div>
             )}
-            <button type="button" onClick={() => { setMenuOpen(false); openStoreModal(); }} className="mt-3 flex w-full items-center gap-2.5 rounded-xl bg-white p-3 text-left ring-1 ring-ink-100">
+            <Link href="/donde-encontrarnos" className="mt-3 flex w-full items-center gap-2.5 rounded-xl bg-white p-3 text-left ring-1 ring-ink-100">
               <MapPin size={20} className="text-brand-600" />
               <span className="flex-1 leading-tight">
-                <span className="block text-xs text-ink-500">Retira en</span>
-                <span className="text-sm font-bold">{store ? store.name : 'Elige tu tienda'}</span>
+                <span className="block text-xs text-ink-500">Solo retiro en tienda</span>
+                <span className="text-sm font-bold">{store.name}</span>
               </span>
               <ChevronRight size={16} className="text-ink-400" />
-            </button>
+            </Link>
           </div>
 
           <div className="px-2 pt-2">
             {[
               { href: '/ofertas', label: 'Ofertas', icon: Flame, cls: 'text-coral-500' },
-              { href: '/nuevos', label: 'Nuevos', icon: Sparkles, cls: 'text-brand-600' },
-              { href: '/marcas', label: 'Marcas', icon: Tag, cls: 'text-ink-500' },
-              { href: '/club', label: 'Club MixMarket', icon: Crown, cls: 'text-sun-600' },
+              { href: '/productos', label: 'Todos los productos', icon: Tag, cls: 'text-ink-500' },
+              { href: '/donde-encontrarnos', label: 'Dónde encontrarnos', icon: MapPin, cls: 'text-brand-600' },
             ].map((l) => (
               <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-xl px-3 py-3 font-bold hover:bg-ink-50">
                 <l.icon size={20} className={l.cls} /> {l.label}
@@ -324,7 +317,6 @@ export default function Header() {
             {[
               { href: '/mis-pedidos', label: 'Mis pedidos', icon: Package },
               { href: '/favoritos', label: 'Favoritos', icon: Heart },
-              { href: '/tiendas', label: 'Tiendas', icon: Store },
               { href: '/ayuda', label: 'Ayuda', icon: HelpCircle },
             ].map((l) => (
               <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-xl px-3 py-3 font-semibold text-ink-700 hover:bg-ink-50">

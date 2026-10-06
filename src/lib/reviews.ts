@@ -14,16 +14,16 @@ const DATES = ['hace 3 días', 'hace 1 semana', 'hace 2 semanas', 'hace 1 mes', 
 
 const TEXTS: Record<number, { title: string; body: string }[]> = {
   5: [
-    { title: 'Excelente compra', body: 'Llegó antes de lo esperado y el producto es tal cual la descripción. Lo volvería a comprar sin dudar.' },
-    { title: 'Superó mis expectativas', body: 'La calidad es muy buena para el precio que tiene. Lo recomiendo totalmente.' },
+    { title: 'Excelente compra', body: 'Estaba listo antes de lo esperado y el producto es tal cual la descripción. Lo volvería a comprar sin dudar.' },
+    { title: 'Superó mis expectativas', body: 'La calidad es muy buena para el precio. Lo recomiendo totalmente.' },
     { title: 'Muy conforme', body: 'Cumple con todo lo que promete. Además el retiro en tienda fue rápido y sin filas.' },
   ],
   4: [
-    { title: 'Muy bueno', body: 'Buen producto por el precio. Le saco una estrella porque el empaque venía algo golpeado, pero funciona perfecto.' },
-    { title: 'Cumple bien', body: 'Es lo que esperaba. Lo uso hace un par de semanas y no tengo reclamos.' },
+    { title: 'Muy bueno', body: 'Buen producto por el precio. Le saco una estrella porque el empaque venía algo golpeado, pero el producto está perfecto.' },
+    { title: 'Cumple bien', body: 'Es lo que esperaba. Lo compro seguido y no tengo reclamos.' },
   ],
   3: [
-    { title: 'Cumple, sin más', body: 'Está bien para lo que cuesta, aunque esperaba un poco más de rendimiento.' },
+    { title: 'Cumple, sin más', body: 'Está bien para lo que cuesta, aunque esperaba un poco más de sabor.' },
   ],
 };
 

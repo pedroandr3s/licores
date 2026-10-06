@@ -6,7 +6,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Marcas',
-  description: 'Todas las marcas disponibles en MIXMARKET: perfumería, tecnología, hogar, mascotas y más.',
+  description: 'Todas las marcas disponibles en Botillería Oasis: cervezas, vinos, destilados y snacks.',
   alternates: { canonical: '/marcas' },
 };
 

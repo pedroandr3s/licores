@@ -5,8 +5,8 @@ import { slugify } from './format';
 import { searchProducts } from './search';
 
 export type SortKey = 'relevance' | 'price-asc' | 'price-desc' | 'bestsellers' | 'rating';
-export type PriceRange = '' | 'lt10' | '10-20' | '20-50' | 'gt50';
-export type AvailFlag = 'stock' | 'pickup' | 'delivery';
+export type PriceRange = '' | 'lt3' | '3-8' | '8-15' | 'gt15';
+export type AvailFlag = 'stock' | 'alcohol' | 'noalcohol';
 
 export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
   { value: 'relevance', label: 'Relevancia' },
@@ -17,23 +17,23 @@ export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 ];
 
 export const PRICE_RANGES: { id: Exclude<PriceRange, ''>; label: string; test: (n: number) => boolean }[] = [
-  { id: 'lt10', label: 'Menos de $10.000', test: (n) => n < 10000 },
-  { id: '10-20', label: '$10.000 - $20.000', test: (n) => n >= 10000 && n < 20000 },
-  { id: '20-50', label: '$20.000 - $50.000', test: (n) => n >= 20000 && n <= 50000 },
-  { id: 'gt50', label: 'Más de $50.000', test: (n) => n > 50000 },
+  { id: 'lt3', label: 'Menos de $3.000', test: (n) => n < 3000 },
+  { id: '3-8', label: '$3.000 - $8.000', test: (n) => n >= 3000 && n < 8000 },
+  { id: '8-15', label: '$8.000 - $15.000', test: (n) => n >= 8000 && n <= 15000 },
+  { id: 'gt15', label: 'Más de $15.000', test: (n) => n > 15000 },
 ];
 
 export const AVAIL_OPTIONS: { id: AvailFlag; label: string }[] = [
   { id: 'stock', label: 'Disponible' },
-  { id: 'pickup', label: 'Retiro en tienda' },
-  { id: 'delivery', label: 'Despacho' },
+  { id: 'alcohol', label: 'Con alcohol' },
+  { id: 'noalcohol', label: 'Sin alcohol' },
 ];
 
 export const DISCOUNT_OPTIONS = [
   { value: 0, label: 'Cualquier descuento' },
+  { value: 10, label: '10% o más' },
+  { value: 15, label: '15% o más' },
   { value: 20, label: '20% o más' },
-  { value: 30, label: '30% o más' },
-  { value: 50, label: '50% o más' },
 ];
 
 export interface CatalogFilters {
@@ -88,7 +88,7 @@ export function parseFilters(sp: ParamsLike, category = ''): CatalogFilters {
     avail: availParam
       ? (availParam.split(',').filter((a) => AVAIL_OPTIONS.some((o) => o.id === a)) as AvailFlag[])
       : [],
-    disc: [20, 30, 50, 70].includes(disc) ? disc : 0,
+    disc: [10, 15, 20, 25].includes(disc) ? disc : 0,
     sort: SORT_OPTIONS.some((s) => s.value === sort) ? sort : 'relevance',
     page,
     isNew: sp.get('nuevo') === '1',
@@ -137,11 +137,11 @@ export function applyFilters(f: CatalogFilters): Product[] {
   }
   if (f.brands.length) list = list.filter((p) => f.brands.includes(p.brand));
   if (f.avail.includes('stock')) list = list.filter((p) => p.stock > 0);
-  if (f.avail.includes('pickup')) list = list.filter((p) => p.availableForPickup && p.stock > 0);
-  if (f.avail.includes('delivery')) list = list.filter((p) => p.availableForDelivery && p.stock > 0);
+  if (f.avail.includes('alcohol') && !f.avail.includes('noalcohol')) list = list.filter((p) => p.isAlcohol);
+  if (f.avail.includes('noalcohol') && !f.avail.includes('alcohol')) list = list.filter((p) => !p.isAlcohol);
   if (f.disc) list = list.filter((p) => p.discount >= f.disc);
   if (f.isNew) list = list.filter((p) => p.isNew);
-  if (f.offers) list = list.filter((p) => p.discount >= 30);
+  if (f.offers) list = list.filter((p) => p.discount >= 15);
 
   const keepSearchOrder = f.q && f.sort === 'relevance';
   if (!keepSearchOrder) {

@@ -1,10 +1,10 @@
 import type { Reward } from '@/types';
 
 export const rewards: Reward[] = [
-  { id: 'vale-5000', title: 'Vale de compra $5.000', description: 'Úsalo en tu próxima compra online o en tienda.', points: 2000, shape: 'box', colors: ['#6428e0', '#ffcf3a'] },
-  { id: 'tote-bag', title: 'Tote bag MIXMARKET', description: 'Bolsa reutilizable de algodón con diseño exclusivo.', points: 600, shape: 'bag', colors: ['#fb4b32', '#ffe1db'] },
-  { id: 'envio-gratis-3', title: '3 despachos gratis', description: 'Envío sin costo en tres compras, sin monto mínimo.', points: 900, shape: 'box', colors: ['#12b27a', '#c9f2de'] },
-  { id: 'mini-perfume', title: 'Mini perfume 30 ml', description: 'Fragancia de viaje a elección entre 4 aromas.', points: 1200, shape: 'perfume', colors: ['#e5578a', '#f4c6d7'] },
-  { id: 'termo-acero', title: 'Termo de acero 500 ml', description: 'Mantiene tus bebidas frías o calientes por 12 horas.', points: 1800, shape: 'drink', colors: ['#3a3856', '#bdb9d0'] },
-  { id: 'vale-15000', title: 'Vale de compra $15.000', description: 'El canje más conveniente para tus compras grandes.', points: 5500, shape: 'box', colors: ['#14122b', '#ffcf3a'] },
+  { id: 'vale-3000', title: 'Vale de compra $3.000', description: 'Úsalo en tu próximo pedido online o en el local.', points: 1200, shape: 'box', colors: ['#a8213f', '#e8b53a'] },
+  { id: 'bolsa-hielo', title: '2 bolsas de hielo de 2 kg', description: 'Para que no falte el hielo en la próxima junta.', points: 500, shape: 'bag', colors: ['#2f9bd8', '#bfe6fa'] },
+  { id: 'papas-mix', title: 'Pack de 3 papas fritas', description: 'Tres bolsas de papas fritas a elección.', points: 700, shape: 'bag', colors: ['#e8543a', '#ffe08a'] },
+  { id: 'copas-vino', title: 'Set de 2 copas de vino', description: 'Copas de cristal para disfrutar tu próximo tinto.', points: 1800, shape: 'wine', colors: ['#7a1f3d', '#e8c6a0'] },
+  { id: 'vale-10000', title: 'Vale de compra $10.000', description: 'El canje más conveniente para tus compras grandes.', points: 4000, shape: 'box', colors: ['#14122b', '#e8b53a'] },
+  { id: 'vaso-cerveza', title: 'Vaso cervecero Oasis', description: 'Vaso de vidrio de 500 ml con el logo de la casa.', points: 900, shape: 'drink', colors: ['#e8a600', '#7a4a00'] },
 ];

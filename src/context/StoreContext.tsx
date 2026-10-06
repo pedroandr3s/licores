@@ -10,7 +10,7 @@ import {
   type Dispatch,
   type ReactNode,
 } from 'react';
-import type { Address, CartLine, DeliveryMode, Order, OrderStatus, Redemption, User } from '@/types';
+import type { CartLine, Order, OrderStatus, Redemption, User } from '@/types';
 import { DEMO_POINTS, STORAGE_KEY } from '@/lib/constants';
 import { getProduct, maxQty } from '@/data/products';
 import { mockOrders } from '@/data/orders';
@@ -21,11 +21,10 @@ export interface PersistedState {
   favorites: string[];
   user: User | null;
   orders: Order[];
-  selectedStoreId: string | null;
-  deliveryMode: DeliveryMode;
   points: number;
   redemptions: Redemption[];
-  addresses: Address[];
+  /** El visitante confirmó ser mayor de 18 años (se recuerda en este navegador) */
+  ageVerified: boolean;
 }
 
 const initialState: PersistedState = {
@@ -33,11 +32,9 @@ const initialState: PersistedState = {
   favorites: [],
   user: null,
   orders: mockOrders,
-  selectedStoreId: null,
-  deliveryMode: 'delivery',
   points: DEMO_POINTS,
   redemptions: [],
-  addresses: [],
+  ageVerified: false,
 };
 
 export type Action =
@@ -51,13 +48,10 @@ export type Action =
   | { type: 'LOGIN'; user: User; points?: number }
   | { type: 'LOGOUT' }
   | { type: 'UPDATE_USER'; user: Partial<User> }
-  | { type: 'SET_STORE'; storeId: string | null }
-  | { type: 'SET_MODE'; mode: DeliveryMode }
   | { type: 'ORDER_ADD'; order: Order }
   | { type: 'ORDER_STATUS'; id: string; status: OrderStatus }
   | { type: 'REDEEM'; redemption: Redemption }
-  | { type: 'ADDR_ADD'; address: Address }
-  | { type: 'ADDR_REMOVE'; id: string }
+  | { type: 'AGE_CONFIRM' }
   | { type: 'RESET' };
 
 function reducer(state: PersistedState, action: Action): PersistedState {
@@ -110,10 +104,6 @@ function reducer(state: PersistedState, action: Action): PersistedState {
       return { ...state, user: null };
     case 'UPDATE_USER':
       return state.user ? { ...state, user: { ...state.user, ...action.user } } : state;
-    case 'SET_STORE':
-      return { ...state, selectedStoreId: action.storeId };
-    case 'SET_MODE':
-      return { ...state, deliveryMode: action.mode };
     case 'ORDER_ADD':
       return {
         ...state,
@@ -132,12 +122,11 @@ function reducer(state: PersistedState, action: Action): PersistedState {
         points: Math.max(0, state.points - action.redemption.points),
         redemptions: [action.redemption, ...state.redemptions],
       };
-    case 'ADDR_ADD':
-      return { ...state, addresses: [...state.addresses, action.address] };
-    case 'ADDR_REMOVE':
-      return { ...state, addresses: state.addresses.filter((a) => a.id !== action.id) };
+    case 'AGE_CONFIRM':
+      return { ...state, ageVerified: true };
     case 'RESET':
-      return { ...initialState };
+      // La confirmación de edad se conserva: restablecer la demo no la borra
+      return { ...initialState, ageVerified: state.ageVerified };
     default:
       return state;
   }
@@ -199,6 +188,5 @@ export function useCartLines(): PricedLine[] {
 
 export function useCartTotals(): Totals & { lines: PricedLine[] } {
   const lines = useCartLines();
-  const { deliveryMode } = useStore();
-  return useMemo(() => ({ ...calcTotals(lines, deliveryMode), lines }), [lines, deliveryMode]);
+  return useMemo(() => ({ ...calcTotals(lines), lines }), [lines]);
 }

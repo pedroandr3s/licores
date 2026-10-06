@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-const KEY = 'mixmarket:flash-end';
+const KEY = 'oasis:flash-end';
 const DEFAULT_MS = (5 * 3600 + 32 * 60 + 18) * 1000;
 
 function readEnd() {

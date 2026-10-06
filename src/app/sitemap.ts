@@ -1,17 +1,15 @@
 import type { MetadataRoute } from 'next';
 import { products } from '@/data/products';
 import { categories } from '@/data/categories';
-import { stores } from '@/data/stores';
 import { infoPages } from '@/data/content';
 import { SITE_URL } from '@/lib/constants';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ['', '/productos', '/ofertas', '/nuevos', '/marcas', '/tiendas', '/club', '/ayuda'];
+  const staticRoutes = ['', '/productos', '/ofertas', '/nuevos', '/marcas', '/donde-encontrarnos', '/club', '/ayuda'];
   return [
     ...staticRoutes.map((r) => ({ url: `${SITE_URL}${r}`, changeFrequency: 'daily' as const, priority: r === '' ? 1 : 0.8 })),
     ...categories.map((c) => ({ url: `${SITE_URL}/productos/${c.slug}`, changeFrequency: 'daily' as const, priority: 0.8 })),
     ...products.map((p) => ({ url: `${SITE_URL}/producto/${p.id}`, changeFrequency: 'weekly' as const, priority: 0.6 })),
-    ...stores.map((s) => ({ url: `${SITE_URL}/tiendas/${s.id}`, changeFrequency: 'monthly' as const, priority: 0.4 })),
     ...infoPages.map((p) => ({ url: `${SITE_URL}/ayuda/${p.slug}`, changeFrequency: 'monthly' as const, priority: 0.3 })),
   ];
 }
